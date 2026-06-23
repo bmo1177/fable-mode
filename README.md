@@ -10,26 +10,26 @@
 <h1 align="center">Fable Mode</h1>
 
 <p align="center">
-  <strong>Staged execution discipline for AI agents that refuses to let them work beneath their own standard.</strong>
+  <strong>Staged execution discipline for AI agents.</strong>
 </p>
 
 <p align="center">
   Decomposes complex work into stages with machine-verifiable checks.<br>
-  Enforces proof before delivery. Demands skeptical self-review.
+  Enforces proof before delivery. Runs a skeptical self-review.
 </p>
 
 ---
 
 ## The Problem
 
-AI agents are great at single-step tasks. But ask them to refactor 12 files, migrate an API, or write a research report — and things break silently.
+AI agents are good at single-step tasks. Ask them to refactor 12 files, migrate an API, or write a research report and things break silently.
 
 - Stages get skipped because "it should work"
 - Tests are never actually run
 - Regressions pile up undetected
 - The agent delivers with confidence, but no evidence
 
-**Fable Mode fixes this.** It forces the agent to plan before acting, prove each stage before moving on, and review its own work before delivery.
+Fable Mode fixes this. The agent plans before acting, proves each stage before moving on, and reviews its own work before delivery.
 
 ---
 
@@ -37,39 +37,40 @@ AI agents are great at single-step tasks. But ask them to refactor 12 files, mig
 
 | Feature | What It Does |
 |---------|-------------|
-| **Gate Check** | Refuses to activate on trivial tasks — no overhead where discipline isn't needed |
-| **3 Modes** | `basic` (sequential), `full` (parallel delegation), `lite` (lightweight) |
-| **4 Agents** | Cartographer, Blacksmith, Sage, Mirror — each with defined roles and boundaries |
-| **Stage Planning** | Every task decomposed into stages with concrete outputs and verification checks |
-| **Machine-Verifiable Checks** | Every check is a command that can pass or fail — no "looks good to me" |
-| **Final Proof** | Validates that all stages integrate and requirements are met before delivery |
-| **Self-Review** | Mirror agent catches hidden complexity, assumptions, and weakened checks |
-| **Failure Paths** | 12 documented failure scenarios with recovery strategies |
-| **Domain-Agnostic** | Works for code, research, data, and multi-step tasks |
+| Gate Check | Refuses to activate on trivial tasks. No overhead where discipline isn't needed. |
+| 3 Modes | `basic` (sequential), `full` (parallel delegation), `lite` (lightweight) |
+| 4 Agents | Cartographer, Blacksmith, Sage, Mirror. Each has defined roles and boundaries. |
+| Stage Planning | Every task decomposed into stages with concrete outputs and verification checks |
+| Verification Checks | Every check is a command that can pass or fail. No "looks good to me." |
+| Final Proof | Validates that all stages integrate and requirements are met before delivery |
+| Self-Review | Mirror agent catches hidden complexity, assumptions, and weakened checks |
+| Failure Paths | 12 documented failure scenarios with recovery strategies |
+| Domain-Agnostic | Works for code, research, data, and multi-step tasks |
 
 ---
 
 ## Quick Start
 
-**Activate fable mode:**
+Activate fable mode:
 ```
 fable mode on — refactor the authentication module across 5 files
 ```
 
-**What happens:**
-1. **Gate check** — Is this complex enough? Yes → proceed
-2. **Cartographer** — Decomposes into 5 stages with verification checks
-3. **Blacksmith** — Executes each stage, runs checks
-4. **Sage** — Validates the whole holds together
-5. **Mirror** — Skeptical self-review before delivery
+What happens:
 
-**That's it.** The agent delivers with evidence, not confidence.
+1. Gate check. Is this complex enough? Yes, proceed.
+2. Cartographer decomposes into 5 stages with verification checks.
+3. Blacksmith executes each stage, runs checks.
+4. Sage validates the whole holds together.
+5. Mirror runs a skeptical self-review before delivery.
+
+That's it. The agent delivers with evidence, not confidence.
 
 ---
 
 ## Installation
 
-Fable Mode is an [OpenCode](https://opencode.ai) skill. Install it by copying the skill directory to your OpenCode skills folder:
+Fable Mode is an [OpenCode](https://opencode.ai) skill. Copy the skill directory to your OpenCode skills folder:
 
 ```bash
 # Clone the repository
@@ -80,6 +81,7 @@ cp -r fable-mode ~/.config/opencode/skills/fable-mode
 ```
 
 Or install manually:
+
 1. Download or clone this repository
 2. Copy the `fable-mode/` directory to `~/.config/opencode/skills/`
 3. Restart OpenCode
@@ -87,8 +89,8 @@ Or install manually:
 ### Requirements
 
 - OpenCode or Claude Code runtime
-- Bash access (for running verification checks)
-- Sub-agent support (for `full` mode parallel delegation — optional)
+- Bash access for running verification checks
+- Sub-agent support for `full` mode parallel delegation (optional)
 
 ---
 
@@ -103,6 +105,7 @@ fable mode on — add input validation to the registration form
 ```
 
 The agent will:
+
 1. Plan the work in stages
 2. Execute each stage sequentially
 3. Run verification checks after each stage
@@ -126,11 +129,12 @@ For moderate tasks with 2-4 steps:
 fable mode lite — refactor the utility functions in src/utils
 ```
 
-Simplified pipeline: plan → execute → verify → deliver.
+Simplified pipeline: plan, execute, verify, deliver.
 
 ### Trigger Keywords
 
 Fable mode activates when the user says:
+
 - "fable mode" / "fable mode on"
 - "Hero's Guild"
 - "staged execution"
@@ -177,22 +181,23 @@ User: "fable mode on — [task]"
 
 Before fable mode activates, two conditions must be met:
 
-1. **The task cannot be done in one confident step** — If it can, fable mode is overhead
-2. **Discipline reduces failure risk** — Not just pageantry
+1. The task cannot be done in one confident step. If it can, fable mode is overhead.
+2. Discipline reduces failure risk. Not just pageantry.
 
 ### Verification Checks
 
 Every stage must have a verification check that is:
-- **Concrete** — A specific command (`pytest`, `npx tsc --noEmit`, `npm run lint`)
-- **Machine-verifiable** — Runs as a tool call, produces pass/fail output
-- **Honest** — Can genuinely fail. "Looks good" cannot fail honestly.
 
-**Good check:**
+- Concrete: a specific command (`pytest`, `npx tsc --noEmit`, `npm run lint`)
+- Machine-verifiable: runs as a tool call, produces pass/fail output
+- Honest: can genuinely fail. "Looks good" cannot fail honestly.
+
+Good check:
 ```
 pytest --tb=short → exits 0 with all tests passing
 ```
 
-**Bad check:**
+Bad check:
 ```
 "Does the API response look correct?" → subjective, no evidence
 ```
@@ -203,10 +208,10 @@ pytest --tb=short → exits 0 with all tests passing
 
 | Agent | Role | Active During |
 |-------|------|---------------|
-| **Cartographer** | Decomposes tasks into stages, defines verification checks | Rite the First |
-| **Blacksmith** | Executes stages, runs checks, handles failures | Rite the Second + Third |
-| **Sage** | Final Proof of Deeds — validates integration and requirements | Rite the Third (final) |
-| **Mirror** | Self-review — catches hidden complexity and process flaws | Rite the Fourth |
+| Cartographer | Decomposes tasks into stages, defines verification checks | Rite the First |
+| Blacksmith | Executes stages, runs checks, handles failures | Rite the Second + Third |
+| Sage | Final Proof of Deeds. Validates integration and requirements. | Rite the Third (final) |
+| Mirror | Self-review. Catches hidden complexity and process flaws. | Rite the Fourth |
 
 Each agent has a defined scope and cannot cross into another agent's territory.
 
@@ -220,10 +225,10 @@ fable-mode/
 ├── README.md                             # This file
 │
 ├── agents/
-│   ├── cartographer_agent.md             # Planning agent — stage decomposition
-│   ├── blacksmith_agent.md               # Execution agent — run stages & checks
-│   ├── sage_agent.md                     # Verification agent — Final Proof
-│   └── mirror_agent.md                  # Self-review agent — skeptical check
+│   ├── cartographer_agent.md             # Planning agent: stage decomposition
+│   ├── blacksmith_agent.md               # Execution agent: run stages & checks
+│   ├── sage_agent.md                     # Verification agent: Final Proof
+│   └── mirror_agent.md                  # Self-review agent: skeptical check
 │
 ├── references/
 │   ├── check_types_by_domain.md          # Verification patterns (code/research/data)
@@ -244,17 +249,17 @@ fable-mode/
     └── research_project.md               # Research/writing project example
 ```
 
-**17 files · 2,652 lines · 6 categories**
+17 files. 2,652 lines. 6 categories.
 
 ---
 
 ## Hard Limits
 
-These rules always apply — no exceptions:
+These rules always apply, no exceptions:
 
 1. Never execute a stage without its check written in the plan
 2. Never mark a stage complete without running its check
-3. Never proceed past a failed check — fix first
+3. Never proceed past a failed check. Fix first.
 4. Never deliver until the Final Proof passes
 5. If a fix changes prior output, re-run that stage's check
 
@@ -265,7 +270,7 @@ These rules always apply — no exceptions:
 | # | Failure | Strategy |
 |---|---------|----------|
 | F1 | Stage check fails | Diagnose, fix, re-run |
-| F2 | Check fails 3x consecutively | STOP — escalate to user |
+| F2 | Check fails 3x consecutively | STOP. Escalate to user. |
 | F3 | Final Proof fails | Re-run failing stage from forge |
 | F4 | Circular dependencies | Redesign stage plan |
 | F5 | Parallel stage conflicts | Serialize conflicting stages |
@@ -283,9 +288,9 @@ See [`references/failure_paths.md`](references/failure_paths.md) for the complet
 |---------|----------|--------|------|
 | [Multi-File Refactor](examples/multi_file_refactor.md) | Extract shared auth logic across 5 files | 5 | basic |
 | [API Migration](examples/api_migration.md) | Migrate 12 endpoints from v1 to v2 | 8 | full |
-| [Research Project](examples/research_project.md) | Research report with lit review + analysis | 6 | basic |
+| [Research Project](examples/research_project.md) | Research report with lit review and analysis | 6 | basic |
 
-Each example shows the complete fable mode workflow: gate evaluation → stage plan → execution → proof → mirror → delivery.
+Each example shows the complete fable mode workflow: gate evaluation, stage plan, execution, proof, mirror, delivery.
 
 ---
 
@@ -323,11 +328,11 @@ Contributions are welcome. Please:
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## Acknowledgments
 
 Inspired by the Hero's Guild of Bowerstone.
-Because any fool can swing a sword — but a Hero plans the battle first.
+Any fool can swing a sword. A Hero plans the battle first.
