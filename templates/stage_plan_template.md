@@ -1,0 +1,103 @@
+# Stage Plan Template
+
+## Purpose
+
+This is the standard output format for the Cartographer Agent. Fill in all fields before presenting the plan to the user for acceptance.
+
+---
+
+## Template
+
+```markdown
+# Stage Plan: [Task Name]
+
+**Date**: [YYYY-MM-DD]
+**Mode**: [basic / full / lite]
+**Total Stages**: [N]
+**Estimated Complexity**: [Low / Medium / High]
+
+---
+
+## Task Description
+
+[Original task description from user]
+
+---
+
+## Stage Plan
+
+### Stage 1: [Stage Name]
+
+- **Goal**: [What this stage accomplishes]
+- **Expected Output**: [Concrete output — file, test result, data structure]
+- **Verification Check**: [Exact command or method]
+- **Dependencies**: none
+
+### Stage 2: [Stage Name]
+
+- **Goal**: [What this stage accomplishes]
+- **Expected Output**: [Concrete output]
+- **Verification Check**: [Exact command or method]
+- **Dependencies**: Stage 1
+
+### Stage 3: [Stage Name]
+
+- **Goal**: [What this stage accomplishes]
+- **Expected Output**: [Concrete output]
+- **Verification Check**: [Exact command or method]
+- **Dependencies**: Stage 2
+
+[Add more stages as needed]
+
+---
+
+## Final Proof of Deeds
+
+**Check**: [Exact command or method to verify the entire quest succeeded]
+**Success Criteria**: [What "done" looks like — all stages pass, integration verified, requirements met]
+
+---
+
+## Dependency Graph
+
+```
+Stage 1 (none) --> Stage 2 (Stage 1) --> Stage 3 (Stage 2)
+                                          |
+Stage 4 (none) -------------------------->+
+```
+
+[Visual representation of stage dependencies]
+
+---
+
+## Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|------------|
+| [Risk 1] | [Low/Med/High] | [Low/Med/High] | [How to mitigate] |
+| [Risk 2] | [Low/Med/High] | [Low/Med/High] | [How to mitigate] |
+
+---
+
+## Acceptance
+
+- [ ] Plan reviewed by user
+- [ ] All stages have concrete outputs
+- [ ] All stages have failable checks
+- [ ] Dependencies are clear and non-circular
+- [ ] Final Proof is defined
+
+**Status**: [Pending / Accepted / Rejected]
+```
+
+---
+
+## Instructions
+
+1. Fill in all fields in the template above.
+2. Every stage MUST have a Verification Check that is a concrete, machine-verifiable command.
+3. Dependencies must be explicit and non-circular.
+4. The Final Proof must be defined BEFORE any stage is executed.
+5. Present the plan to the user for acceptance before proceeding.
+6. If the user requests changes, revise the plan and re-present.
+7. Only proceed to execution after the user accepts the plan (or if no user is present, after self-validation).
