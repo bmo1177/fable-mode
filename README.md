@@ -14,8 +14,8 @@
 </p>
 
 <p align="center">
-  Decomposes complex work into stages with machine-verifiable checks.<br>
-  Enforces proof before delivery. Runs a skeptical self-review.
+  Breaks complex work into stages with verifiable checks.<br>
+  Requires proof before moving on. Runs a skeptical self-review.
 </p>
 
 ---
@@ -29,7 +29,7 @@ AI agents are good at single-step tasks. Ask them to refactor 12 files, migrate 
 - Regressions pile up undetected
 - The agent delivers with confidence, but no evidence
 
-Fable Mode fixes this. The agent plans before acting, proves each stage before moving on, and reviews its own work before delivery.
+Fable Mode makes the agent plan before acting, prove each stage before moving on, and review its own work before delivery.
 
 ---
 
@@ -53,7 +53,7 @@ Fable Mode fixes this. The agent plans before acting, proves each stage before m
 
 Activate fable mode:
 ```
-fable mode on — refactor the authentication module across 5 files
+fable mode on -- refactor the authentication module across 5 files
 ```
 
 What happens:
@@ -64,7 +64,7 @@ What happens:
 4. Sage validates the whole holds together.
 5. Mirror runs a skeptical self-review before delivery.
 
-That's it. The agent delivers with evidence, not confidence.
+The agent delivers with evidence, not confidence.
 
 ---
 
@@ -101,7 +101,7 @@ Or install manually:
 For multi-file tasks with sequential steps:
 
 ```
-fable mode on — add input validation to the registration form
+fable mode on -- add input validation to the registration form
 ```
 
 The agent will:
@@ -116,7 +116,7 @@ The agent will:
 For large tasks where stages can run concurrently:
 
 ```
-fable mode full — migrate our API from v1 to v2, touching 12 endpoints
+fable mode full -- migrate our API from v1 to v2, touching 12 endpoints
 ```
 
 Independent stages are dispatched in parallel using sub-agents.
@@ -126,7 +126,7 @@ Independent stages are dispatched in parallel using sub-agents.
 For moderate tasks with 2-4 steps:
 
 ```
-fable mode lite — refactor the utility functions in src/utils
+fable mode lite -- refactor the utility functions in src/utils
 ```
 
 Simplified pipeline: plan, execute, verify, deliver.
@@ -157,7 +157,7 @@ Fable mode activates when the user says:
 ### The 4 Rites
 
 ```
-User: "fable mode on — [task]"
+User: "fable mode on -- [task]"
      |
 === Rite the First: The Cartographer's Map ===
      |-> Decompose into stages with verification checks
