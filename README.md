@@ -31,6 +31,18 @@ AI agents are good at single-step tasks. Ask them to refactor 12 files, migrate 
 
 Fable Mode makes the agent plan before acting, prove each stage before moving on, and review its own work before delivery.
 
+```mermaid
+graph LR
+    A[User Request] --> B{Gate Check}
+    B -->|Too simple| C[Normal Execution]
+    B -->|Complex enough| D[Fable Mode]
+    D --> E[Plan]
+    E --> F[Execute]
+    F --> G[Verify]
+    G --> H[Review]
+    H --> I[Delivery with Evidence]
+```
+
 ---
 
 ## Features
@@ -156,6 +168,25 @@ Fable mode activates when the user says:
 
 ### The 4 Rites
 
+```mermaid
+graph TD
+    A[User: fable mode on] --> B[Rite 1: Cartographer's Map]
+    B -->|Plan accepted| C[Rite 2: Summoning of Allies]
+    C --> D[Rite 3: Proof of Deeds]
+    D -->|All checks pass| E[Rite 4: Mirror of the Guild]
+    D -->|Check fails| F[Return to Forge]
+    F --> C
+    E -->|Clean| G[Delivery]
+    E -->|Flaw found| H[Fix before delivery]
+    H --> E
+
+    style B fill:#4a9eff,color:#fff
+    style C fill:#ff6b6b,color:#fff
+    style D fill:#51cf66,color:#fff
+    style E fill:#ffd43b,color:#000
+    style G fill:#51cf66,color:#fff
+```
+
 ```
 User: "fable mode on -- [task]"
      |
@@ -214,6 +245,20 @@ Bad check:
 | Mirror | Self-review. Catches hidden complexity and process flaws. | Rite the Fourth |
 
 Each agent has a defined scope and cannot cross into another agent's territory.
+
+```mermaid
+graph TD
+    U[User] --> C[Cartographer]
+    C -->|Stage Plan| B[Blacksmith]
+    B -->|Execution Results| S[Sage]
+    S -->|Final Proof| M[Mirror]
+    M -->|Self-Review| D[Delivery]
+
+    style C fill:#4a9eff,color:#fff
+    style B fill:#ff6b6b,color:#fff
+    style S fill:#51cf66,color:#fff
+    style M fill:#ffd43b,color:#000
+```
 
 ---
 
@@ -277,6 +322,24 @@ These rules always apply, no exceptions:
 | F6 | Scope creep | Freeze scope, finish current plan |
 | F7 | Tool unavailable | Mark UNVERIFIED, flag explicitly |
 | F8 | Flaw found after delivery | Recall, fix, re-deliver |
+
+```mermaid
+graph TD
+    A[Stage Check] -->|Pass| B[Next Stage]
+    A -->|Fail| C[Diagnose & Fix]
+    C -->|Fixed| A
+    C -->|3x Fail| D[STOP: Escalate to User]
+    B -->|All Pass| E[Final Proof]
+    E -->|Pass| F[Mirror Review]
+    E -->|Fail| G[Re-run Failing Stage]
+    G --> A
+    F -->|Clean| H[Delivery]
+    F -->|Flaw| I[Fix & Re-review]
+    I --> F
+
+    style D fill:#ff6b6b,color:#fff
+    style H fill:#51cf66,color:#fff
+```
 
 See [`references/failure_paths.md`](references/failure_paths.md) for the complete failure path map.
 
