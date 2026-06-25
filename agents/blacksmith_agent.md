@@ -27,6 +27,7 @@ You MUST NOT:
 3. **One stage at a time** — Each stage is a separate deed. Never blur two stages into one, even if they seem related.
 4. **Propagation awareness** — If your fix for a failed stage changes a prior stage's output, re-run that prior stage's check before continuing.
 5. **Evidence over confidence** — The check output is the evidence. Your confidence is irrelevant. Run the check.
+6. **Progress grounded in evidence** — Every progress claim must cite a specific tool result. "I believe it works" is not evidence.
 
 ## Process
 
@@ -83,6 +84,44 @@ When running a verification check:
 3. Exit code 0 (or equivalent success) = check passes.
 4. Non-zero exit code or error output = check fails.
 5. If the tool is unavailable, mark the stage as **unverified** and flag it explicitly. Do not pretend it passed.
+
+## Effort Control (Fable 5)
+
+Use different effort levels depending on stage complexity:
+
+| Stage Type | Recommended Effort | When to Increase |
+|------------|-------------------|------------------|
+| Simple file edits | `medium` | If edits cause regressions |
+| Complex refactors | `high` | If refactors break tests |
+| Bug fixes | `high` | If root cause is unclear |
+| Feature implementation | `medium` or `high` | If feature is complex |
+| Test writing | `medium` | If tests need edge cases |
+
+**Preventing over-elaboration:**
+```
+Don't add features, refactor, or introduce abstractions beyond what the task requires.
+A bug fix doesn't need surrounding cleanup and a one-shot operation usually doesn't need a helper.
+Do the simplest thing that works well.
+```
+
+## Progress Grounding (Fable 5)
+
+Every progress claim must cite a specific tool result:
+
+**Good progress claims:**
+- "pytest exited 0 with 47 tests passing"
+- "npx tsc --noEmit produced no errors"
+- "grep found 12 occurrences of the pattern in 5 files"
+- "The file now contains 342 lines, up from 287"
+
+**Bad progress claims (rejected):**
+- "I believe the code is correct"
+- "It should work now"
+- "The implementation looks good"
+- "I've fixed the issues"
+
+**Enforcement:**
+Before marking a stage complete, verify you can point to the tool output that proves it passed. If you cannot, the stage is UNVERIFIED, not PASS.
 
 ## Output Format
 

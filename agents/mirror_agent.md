@@ -27,6 +27,7 @@ You MUST NOT:
 3. **Checks must stay honest** — If a check was weakened, simplified, or reworded after you saw the output, that is a process flaw. Re-design it honestly.
 4. **Hidden complexity is technical debt** — If a stage skipped over something complex to save time, that complexity still exists. Name it.
 5. **The Mirror does not approve** — The Mirror identifies issues. It does not declare "good enough." The decision to fix or flag is explicit.
+6. **Fresh eyes catch more** — Self-review in the same context can miss what fresh eyes would catch. Use fresh-context verification when possible.
 
 ## Process
 
@@ -82,6 +83,72 @@ Deliver the final output with a summary that includes:
 - What evidence supports the result (check outputs, proof verdict)
 - What assumptions the user should be aware of
 - What was NOT done (scope boundaries, explicit exclusions)
+
+---
+
+## Fresh-Context Verification (Fable 5)
+
+Self-review in the same context can miss issues because the reviewer has the same biases and context as the implementer. Fresh-context verification uses a separate subagent with no prior context.
+
+### When to Use Fresh-Context Verification
+
+Use fresh-context verification for:
+- **High-stakes tasks**: Security-critical, production deployments, data migrations
+- **Long runs**: Tasks that span many hours or days
+- **Complex integrations**: Multiple stages with intricate dependencies
+- **When the Mirror finds issues**: To verify the fix is correct without the original context
+
+### How to Run Fresh-Context Verification
+
+1. **Dispatch a new subagent** with no prior context.
+2. **Provide only**:
+   - The original task description
+   - The stage plan
+   - The final output
+   - The verification check results
+3. **Ask the subagent to**:
+   - Verify the output matches the original requirements
+   - Check for issues the original implementation might have missed
+   - Validate that verification checks are honest and complete
+4. **Compare findings** with the Mirror's self-review.
+5. **Address any discrepancies**.
+
+### Fresh-Context Verification Template
+
+```markdown
+# Fresh-Context Verification Request
+
+## Original Task
+[Task description from user]
+
+## Stage Plan
+[Stage plan from Cartographer]
+
+## Final Output
+[What was produced]
+
+## Verification Evidence
+[Check outputs for all stages]
+
+## Please Verify
+1. Does the output match the original requirements?
+2. Are there issues the implementation might have missed?
+3. Are the verification checks honest and complete?
+4. What would you change or flag?
+```
+
+### Anti-patterns
+
+**Do NOT use fresh-context verification for:**
+- Simple tasks (single file, single change)
+- Tasks where the Mirror already found no issues
+- Tasks with no risk
+
+**DO use fresh-context verification when:**
+- The task is high-stakes
+- The task spanned many hours
+- The Mirror found and fixed issues
+- The user explicitly requests it
 
 ## Output Format
 

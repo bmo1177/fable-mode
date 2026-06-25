@@ -1,6 +1,6 @@
 <p align="center">
   <br>
-  <img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version">
+  <img src="https://img.shields.io/badge/version-2.1.0-blue" alt="Version">
   <img src="https://img.shields.io/badge/status-active-brightgreen" alt="Status">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   <img src="https://img.shields.io/badge/platform-OpenCode%20|%20Claude%20Code-lightgrey" alt="Platform">
@@ -57,8 +57,13 @@ graph LR
 | Vision Verification | Screenshot comparison, design fidelity, accessibility checks using Fable 5 vision |
 | Self-Verification | Write-your-own-tests, reasoning re-derivation, output-against-goal |
 | Dynamic Re-planning | Revise plans when evidence contradicts the hypothesis |
+| Effort Control | Different thinking depth for different stages (high/xhigh for planning, medium for execution) |
+| Fresh-Context Verification | Separate verifier subagent for final review |
+| Progress Grounding | Every progress claim must cite tool evidence |
+| Brevity Instructions | Prevent over-elaboration, lead with outcomes |
+| Fallback Handling | Graceful degradation when Fable 5 refuses or fails |
+| Structured Memory | Lessons learned, corrections, confirmed approaches across sessions |
 | Long-Session Support | Checkpoint system, context compaction, session resume for multi-day tasks |
-| Memory Integration | Cross-session memory for verified facts and user preferences |
 | Final Proof | Validates that all stages integrate and requirements are met before delivery |
 | Self-Review | Mirror agent catches hidden complexity, assumptions, and weakened checks |
 | Failure Paths | 12 documented failure scenarios with recovery strategies |
@@ -299,6 +304,8 @@ fable-mode/
 │   ├── failure_paths.md                  # 12 failure scenarios with recovery
 │   ├── parallel_delegation_guide.md      # How to dispatch parallel stages
 │   ├── verification_examples.md          # 20+ concrete check examples (including vision & self-verification)
+│   ├── fallback_guide.md                 # Handling refusals and fallback mechanisms
+│   ├── memory_system.md                  # Cross-session learning and memory structure
 │   └── changelog.md                      # Version history
 │
 ├── templates/
@@ -312,7 +319,7 @@ fable-mode/
     └── research_project.md               # Research/writing project example
 ```
 
-20 files. 3,500+ lines. 7 categories.
+22 files. 4,000+ lines. 8 categories.
 
 ---
 
@@ -365,6 +372,59 @@ For tasks that span multiple days:
 - **Context compaction**: Summarize completed stages to free context
 - **Session resume**: Reconstruct state from checkpoint file
 - **Memory integration**: Persist verified facts and user preferences across sessions
+
+---
+
+## What's New in v2.1
+
+Fable Mode v2.1 deepens integration with Claude Fable 5's advanced capabilities:
+
+### Effort Control
+
+Use different thinking depths for different stages:
+
+| Stage | Effort | Why |
+|-------|--------|-----|
+| Cartographer (planning) | `high` or `xhigh` | Planning requires deep reasoning |
+| Blacksmith (execution) | `medium` or `high` | Execution needs good reasoning |
+| Sage (verification) | `high` | Verification requires careful analysis |
+| Mirror (self-review) | `xhigh` | Self-review benefits from deepest thinking |
+
+### Fresh-Context Verification
+
+Use a separate subagent with no prior context for final verification:
+- Catches issues that same-context self-review misses
+- Recommended for high-stakes, long-running, or complex tasks
+- Provides independent validation of the Mirror's findings
+
+### Progress Grounding
+
+Every progress claim must cite a specific tool result:
+- "pytest exited 0 with 47 tests passing" (good)
+- "I believe it works" (rejected)
+- Eliminates fabricated status reports
+
+### Brevity Instructions
+
+Prevent over-elaboration at high effort settings:
+- Lead with outcomes, not process
+- Be selective about what you include
+- Drop details that don't change what the reader would do next
+
+### Fallback Handling
+
+Graceful degradation when Fable 5 refuses or fails:
+- Server-side and client-side fallback to Opus 4.8
+- Escalation to user with context when fallback fails
+- Prevention strategies to minimize refusals
+
+### Structured Memory
+
+Cross-session learning with structured memory files:
+- Lessons learned from past sessions
+- Corrections to wrong assumptions
+- Confirmed approaches that work
+- Failure patterns to avoid
 
 ---
 

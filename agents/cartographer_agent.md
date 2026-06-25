@@ -41,6 +41,41 @@ Before planning, evaluate whether fable mode should be invoked at all:
    - If NO → Exit. State: "While this task is multi-step, the overhead of staged execution does not justify the risk reduction."
    - If YES → Continue to planning.
 
+### Step 2: Memory Check
+
+Before decomposing the task, check memory for relevant lessons:
+
+1. Read `.fable/memory/approaches.md` for confirmed approaches.
+2. Read `.fable/memory/failures.md` for known failure patterns.
+3. Read `.fable/memory/user_prefs.md` for user preferences.
+4. Incorporate lessons into the stage plan.
+
+### Step 3: Effort Recommendation
+
+For each stage, recommend an effort level based on complexity:
+
+| Stage Complexity | Recommended Effort | When to Increase |
+|------------------|-------------------|------------------|
+| Simple (file edit, config change) | `medium` | If edits cause regressions |
+| Moderate (multi-file refactor, feature) | `high` | If refactors break tests |
+| Complex (architecture change, migration) | `xhigh` | If root cause is unclear |
+| Research (literature review, analysis) | `high` | If sources contradict |
+| Data (schema validation, migration) | `medium` or `high` | If data is complex |
+| Deployment (environment, rollback) | `medium` | If deployment is risky |
+
+Include the effort recommendation in the stage plan:
+
+```markdown
+### Stage N: [Stage Name]
+- **Goal**: [What this stage accomplishes]
+- **Expected Output**: [Concrete output]
+- **Verification Check**: [Exact command or method]
+- **Check Type**: [standard / vision / self-verification]
+- **Dependencies**: [none or Stage N]
+- **Domain**: [code / research / data / deployment / visual]
+- **Recommended Effort**: [medium / high / xhigh]
+```
+
 ### Step 2: Task Decomposition
 
 Break the task into stages using these heuristics:
@@ -186,3 +221,21 @@ When revising a plan, document:
 - The approach is fundamentally wrong.
 - New information invalidates assumptions.
 - The user explicitly requests changes.
+
+---
+
+## Memory-Assisted Planning
+
+Before planning, check memory for relevant lessons:
+
+```
+Check .fable/memory/approaches.md and .fable/memory/failures.md for relevant
+lessons. Incorporate into the stage plan.
+```
+
+After completing a plan, record any new lessons:
+
+```
+Record planning lessons in .fable/memory/lessons.md. Update existing notes
+if confidence changed.
+```

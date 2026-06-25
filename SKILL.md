@@ -8,7 +8,7 @@ description: >
   Trigger when the user explicitly asks ("fable mode" or "fable mode on") or requests Hero's Guild discipline.
   Do NOT trigger on single-step tasks, quick questions, brainstorming sessions, or when the user explicitly declines.
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   last_updated: "2026-06-24"
   status: active
   data_access_level: raw
@@ -35,6 +35,14 @@ A task execution framework that refuses to let agents work beneath their own sta
 - **Dynamic Re-planning** — Revise plans when evidence contradicts the hypothesis
 - **Long-Session Support** — Checkpoint system, context compaction, session resume
 - **Memory Integration** — Cross-session memory for verified facts and user preferences
+
+**v2.1** — Fable 5 deep integration:
+- **Effort Control** — Different thinking depth for different stages (high/xhigh for planning, medium for execution)
+- **Fresh-Context Verification** — Separate verifier subagent for final review
+- **Progress Grounding** — Every progress claim must cite tool evidence
+- **Brevity Instructions** — Prevent over-elaboration, lead with outcomes
+- **Fallback Handling** — Graceful degradation when Fable 5 refuses or fails
+- **Structured Memory** — Lessons learned, corrections, confirmed approaches
 
 ---
 
@@ -303,6 +311,86 @@ See `references/failure_paths.md` for the complete failure path map.
 | F6 | User interrupts mid-stage | Low | Save progress, summarize state |
 | F7 | Verification tool unavailable | Medium | Mark stage as unverified, flag explicitly |
 | F8 | Mirror finds flaw after delivery | High | Recall, fix, re-run Proof, re-deliver |
+
+---
+
+## Effort Control (Fable 5)
+
+Fable 5 uses an effort parameter to control thinking depth. Use different effort levels for different stages:
+
+| Stage | Recommended Effort | Why |
+|-------|-------------------|-----|
+| Cartographer (planning) | `high` or `xhigh` | Planning requires deep reasoning about decomposition and dependencies |
+| Blacksmith (execution) | `medium` or `high` | Execution needs good reasoning but not maximum depth |
+| Sage (verification) | `high` | Verification requires careful analysis of integration |
+| Mirror (self-review) | `xhigh` | Self-review benefits from deepest thinking to catch subtle issues |
+| Researcher | `high` | Research requires thorough source analysis |
+| DataAnalyzer | `medium` or `high` | Data validation needs good reasoning |
+| Deployer | `medium` | Deployment checks are more procedural |
+
+**When to adjust effort:**
+- Increase to `xhigh` if a stage fails repeatedly and the issue is subtle
+- Decrease to `medium` if a stage completes too slowly without quality loss
+- Use `high` as default when uncertain
+
+**Preventing over-elaboration at high effort:**
+```
+Don't add features, refactor, or introduce abstractions beyond what the task requires.
+A bug fix doesn't need surrounding cleanup and a one-shot operation usually doesn't need a helper.
+Don't design for hypothetical future requirements: do the simplest thing that works well.
+Avoid premature abstraction and half-finished implementations.
+Don't add error handling, fallbacks, or validation for scenarios that cannot happen.
+Trust internal code and framework guarantees. Only validate at system boundaries.
+```
+
+---
+
+## Brevity Instructions (Fable 5)
+
+Claude Fable 5 can elaborate beyond what the task needs. Add these instructions to agents:
+
+**For user-facing messages:**
+```
+Lead with the outcome. Your first sentence after finishing should answer "what happened"
+or "what did you find": the thing the user would ask for if they said "just give me the TLDR."
+Supporting detail and reasoning come after.
+
+Being readable and being concise are different things, and readability matters more.
+The way to keep output short is to be selective about what you include (drop details that
+don't change what the reader would do next), not to compress the writing into fragments,
+abbreviations, arrow chains like A → B → fails, or jargon.
+```
+
+**For tool-call narration:**
+```
+Terse shorthand is fine between tool calls (that's you thinking out loud, and brevity
+there is good). Your final summary is different: it's for a reader who didn't see any of that.
+
+If you've been working for a while without the user watching (overnight, across many
+tool calls, since they last spoke), your final message is their first look at any of it.
+Write it as a re-grounding, not a continuation of your working thread: the outcome first,
+then the one or two things you need from them, each explained as if new.
+```
+
+---
+
+## Progress Grounding (Fable 5)
+
+On long autonomous runs, ground every progress claim in actual tool results:
+
+```
+Before reporting progress, audit each claim against a tool result from this session.
+Only report work you can point to evidence for; if something is not yet verified, say
+so explicitly. Report outcomes faithfully: if tests fail, say so with the output; if a
+step was skipped, say that; when something is done and verified, state it plainly
+without hedging.
+```
+
+**Enforcement in fable mode:**
+- Every PASS verdict must include the tool output that proves it
+- Every claim about what was done must reference a specific tool call
+- "I believe it works" is not a progress claim. "pytest exited 0 with 47 tests passing" is.
+- If you cannot point to evidence, mark the stage as UNVERIFIED
 
 ---
 
