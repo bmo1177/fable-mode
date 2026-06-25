@@ -1,6 +1,6 @@
 <p align="center">
   <br>
-  <img src="https://img.shields.io/badge/version-2.1.0-blue" alt="Version">
+  <img src="https://img.shields.io/badge/version-2.1.1-blue" alt="Version">
   <img src="https://img.shields.io/badge/status-active-brightgreen" alt="Status">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   <img src="https://img.shields.io/badge/platform-OpenCode%20|%20Claude%20Code-lightgrey" alt="Platform">
@@ -20,7 +20,7 @@
 
 ---
 
-## The Problem
+## Why Fable Mode?
 
 AI agents are good at single-step tasks. Ask them to refactor 12 files, migrate an API, or write a research report and things break silently.
 
@@ -29,7 +29,7 @@ AI agents are good at single-step tasks. Ask them to refactor 12 files, migrate 
 - Regressions pile up undetected
 - The agent delivers with confidence, but no evidence
 
-Fable Mode makes the agent plan before acting, prove each stage before moving on, and review its own work before delivery.
+**Fable Mode makes the agent plan before acting, prove each stage before moving on, and review its own work before delivery.**
 
 ```mermaid
 graph LR
@@ -45,68 +45,40 @@ graph LR
 
 ---
 
-## Features
-
-| Feature | What It Does |
-|---------|-------------|
-| Gate Check | Refuses to activate on trivial tasks. No overhead where discipline isn't needed. |
-| 3 Modes | `basic` (sequential), `full` (parallel delegation), `lite` (lightweight) |
-| 7 Agents | Cartographer, Blacksmith, Sage, Mirror, Researcher, DataAnalyzer, Deployer |
-| Stage Planning | Every task decomposed into stages with concrete outputs and verification checks |
-| Verification Checks | Every check is a command that can pass or fail. No "looks good to me." |
-| Vision Verification | Screenshot comparison, design fidelity, accessibility checks using Fable 5 vision |
-| Self-Verification | Write-your-own-tests, reasoning re-derivation, output-against-goal |
-| Dynamic Re-planning | Revise plans when evidence contradicts the hypothesis |
-| Effort Control | Different thinking depth for different stages (high/xhigh for planning, medium for execution) |
-| Fresh-Context Verification | Separate verifier subagent for final review |
-| Progress Grounding | Every progress claim must cite tool evidence |
-| Brevity Instructions | Prevent over-elaboration, lead with outcomes |
-| Fallback Handling | Graceful degradation when Fable 5 refuses or fails |
-| Structured Memory | Lessons learned, corrections, confirmed approaches across sessions |
-| Long-Session Support | Checkpoint system, context compaction, session resume for multi-day tasks |
-| Final Proof | Validates that all stages integrate and requirements are met before delivery |
-| Self-Review | Mirror agent catches hidden complexity, assumptions, and weakened checks |
-| Failure Paths | 12 documented failure scenarios with recovery strategies |
-| Domain-Agnostic | Works for code, research, data, deployment, and visual tasks |
-
----
-
 ## Quick Start
 
-Activate fable mode:
 ```
 fable mode on -- refactor the authentication module across 5 files
 ```
 
 What happens:
 
-1. Gate check. Is this complex enough? Yes, proceed.
-2. Cartographer decomposes into 5 stages with verification checks.
-3. Blacksmith executes each stage, runs checks.
-4. Sage validates the whole holds together.
-5. Mirror runs a skeptical self-review before delivery.
+1. **Gate check** — Is this complex enough? Yes, proceed.
+2. **Plan** — Cartographer decomposes into stages with verification checks.
+3. **Execute** — Blacksmith runs each stage, verifies with real commands.
+4. **Prove** — Sage validates the whole holds together.
+5. **Review** — Mirror catches hidden complexity before delivery.
 
-The agent delivers with evidence, not confidence.
+**The agent delivers with evidence, not confidence.**
 
 ---
 
 ## Installation
 
-Fable Mode is an [OpenCode](https://opencode.ai) skill. Copy the skill directory to your OpenCode skills folder:
+### OpenCode (Recommended)
 
 ```bash
-# Clone the repository
+# Clone and install globally
 git clone https://github.com/your-username/fable-mode.git
-
-# Copy to OpenCode skills directory
 cp -r fable-mode ~/.config/opencode/skills/fable-mode
 ```
 
-Or install manually:
+### Claude Code
 
-1. Download or clone this repository
-2. Copy the `fable-mode/` directory to `~/.config/opencode/skills/`
-3. Restart OpenCode
+```bash
+# Copy to project's .claude/skills/ directory
+cp -r fable-mode .claude/skills/fable-mode
+```
 
 ### Requirements
 
@@ -126,13 +98,6 @@ For multi-file tasks with sequential steps:
 fable mode on -- add input validation to the registration form
 ```
 
-The agent will:
-
-1. Plan the work in stages
-2. Execute each stage sequentially
-3. Run verification checks after each stage
-4. Produce a final proof and self-review
-
 ### Full Mode (Parallel)
 
 For large tasks where stages can run concurrently:
@@ -141,8 +106,6 @@ For large tasks where stages can run concurrently:
 fable mode full -- migrate our API from v1 to v2, touching 12 endpoints
 ```
 
-Independent stages are dispatched in parallel using sub-agents.
-
 ### Lite Mode (Lightweight)
 
 For moderate tasks with 2-4 steps:
@@ -150,8 +113,6 @@ For moderate tasks with 2-4 steps:
 ```
 fable mode lite -- refactor the utility functions in src/utils
 ```
-
-Simplified pipeline: plan, execute, verify, deliver.
 
 ### Trigger Keywords
 
@@ -229,16 +190,16 @@ Before fable mode activates, two conditions must be met:
 
 Every stage must have a verification check that is:
 
-- Concrete: a specific command (`pytest`, `npx tsc --noEmit`, `npm run lint`)
-- Machine-verifiable: runs as a tool call, produces pass/fail output
-- Honest: can genuinely fail. "Looks good" cannot fail honestly.
+- **Concrete**: a specific command (`pytest`, `npx tsc --noEmit`, `npm run lint`)
+- **Machine-verifiable**: runs as a tool call, produces pass/fail output
+- **Honest**: can genuinely fail. "Looks good" cannot fail honestly.
 
-Good check:
+✅ Good check:
 ```
 pytest --tb=short → exits 0 with all tests passing
 ```
 
-Bad check:
+❌ Bad check:
 ```
 "Does the API response look correct?" → subjective, no evidence
 ```
@@ -282,106 +243,35 @@ graph TD
 
 ---
 
-## Project Structure
+## Key Features
 
-```
-fable-mode/
-├── SKILL.md                              # Core skill definition (450+ lines)
-├── README.md                             # This file
-│
-├── agents/
-│   ├── cartographer_agent.md             # Planning agent: stage decomposition + re-planning
-│   ├── blacksmith_agent.md               # Execution agent: run stages & checks + self-verification
-│   ├── sage_agent.md                     # Verification agent: Final Proof
-│   ├── mirror_agent.md                  # Self-review agent: skeptical check
-│   ├── researcher_agent.md              # Research specialist: sources, synthesis, contradictions
-│   ├── data_analyzer_agent.md           # Data specialist: schema, integrity, edge cases
-│   └── deployer_agent.md               # Deployment specialist: environment, rollback, smoke tests
-│
-├── references/
-│   ├── check_types_by_domain.md          # Verification patterns (code/research/data/visual)
-│   ├── gate_protocol.md                  # When to enter/exit fable mode
-│   ├── failure_paths.md                  # 12 failure scenarios with recovery
-│   ├── parallel_delegation_guide.md      # How to dispatch parallel stages
-│   ├── verification_examples.md          # 20+ concrete check examples (including vision & self-verification)
-│   ├── fallback_guide.md                 # Handling refusals and fallback mechanisms
-│   ├── memory_system.md                  # Cross-session learning and memory structure
-│   └── changelog.md                      # Version history
-│
-├── templates/
-│   ├── stage_plan_template.md            # Fillable stage plan format (with checkpoint fields)
-│   ├── final_proof_template.md           # Final proof checklist
-│   └── delivery_summary_template.md      # Delivery summary format
-│
-└── examples/
-    ├── multi_file_refactor.md            # Code refactor example (5 stages)
-    ├── api_migration.md                  # API migration with parallel delegation
-    └── research_project.md               # Research/writing project example
-```
-
-22 files. 4,000+ lines. 8 categories.
+| Feature | What It Does |
+|---------|-------------|
+| Gate Check | Refuses to activate on trivial tasks. No overhead where discipline isn't needed. |
+| 3 Modes | `basic` (sequential), `full` (parallel delegation), `lite` (lightweight) |
+| 7 Agents | Cartographer, Blacksmith, Sage, Mirror, Researcher, DataAnalyzer, Deployer |
+| Stage Planning | Every task decomposed into stages with concrete outputs and verification checks |
+| Verification Checks | Every check is a command that can pass or fail. No "looks good to me." |
+| Vision Verification | Screenshot comparison, design fidelity, accessibility checks using Fable 5 vision |
+| Self-Verification | Write-your-own-tests, reasoning re-derivation, output-against-goal |
+| Dynamic Re-planning | Revise plans when evidence contradicts the hypothesis |
+| Effort Control | Different thinking depth for different stages (high/xhigh for planning, medium for execution) |
+| Fresh-Context Verification | Separate verifier subagent for final review |
+| Progress Grounding | Every progress claim must cite tool evidence |
+| Brevity Instructions | Prevent over-elaboration, lead with outcomes |
+| Fallback Handling | Graceful degradation when Fable 5 refuses or fails |
+| Structured Memory | Lessons learned, corrections, confirmed approaches across sessions |
+| Long-Session Support | Checkpoint system, context compaction, session resume for multi-day tasks |
+| Final Proof | Validates that all stages integrate and requirements are met before delivery |
+| Self-Review | Mirror agent catches hidden complexity, assumptions, and weakened checks |
+| Failure Paths | 15 documented failure scenarios with recovery strategies |
+| Domain-Agnostic | Works for code, research, data, deployment, and visual tasks |
 
 ---
 
-## What's New in v2.0
+## Effort Control
 
-Fable Mode v2.0 leverages Claude Fable 5's capabilities for enhanced execution:
-
-### 7 Agents (up from 4)
-
-The Blacksmith now delegates to domain specialists:
-
-| Specialist | Handles | Key Checks |
-|------------|---------|------------|
-| Researcher | Literature search, source verification | Source grading, contradiction detection, citation coverage |
-| DataAnalyzer | Schema validation, integrity checks | Row counts, referential integrity, edge cases |
-| Deployer | Deployment verification, rollback | Environment parity, smoke tests, health checks |
-
-### Vision-Based Verification
-
-Use Fable 5's vision capabilities to verify visual outputs:
-
-- **Screenshot comparison**: Compare rendered UI against reference design
-- **Design fidelity**: Verify component positions, colors, spacing
-- **Responsive layout**: Test at multiple viewport sizes
-- **Accessibility**: Check color contrast, keyboard navigation, ARIA labels
-
-### Self-Verification
-
-The Blacksmith can now verify its own work:
-
-- **Write your own test**: After implementing, write a test that exercises the implementation
-- **Reasoning re-derivation**: Solve twice independently, compare results
-- **Output-against-goal**: Compare final output against original requirements
-- **Code review**: Review own code as if reviewing a pull request
-
-### Dynamic Re-planning
-
-Plans are hypotheses, not sacred texts. When evidence contradicts the plan:
-
-- **Repeated failure**: Stage fails 3 times with different fix attempts
-- **New information**: Execution reveals something the plan didn't account for
-- **User change**: Requirements shift mid-execution
-- **Dependency issues**: Assumptions about dependencies prove wrong
-
-### Long-Session Support
-
-For tasks that span multiple days:
-
-- **Checkpoint system**: Save progress after each stage passes
-- **Context compaction**: Summarize completed stages to free context
-- **Session resume**: Reconstruct state from checkpoint file
-- **Memory integration**: Persist verified facts and user preferences across sessions
-
----
-
-## What's New in v2.1
-
-Fable Mode v2.1 deepens integration with Claude Fable 5's advanced capabilities:
-
-### Effort Control
-
-Use different thinking depths for different stages:
+Different stages require different thinking depths:
 
 | Stage | Effort | Why |
 |-------|--------|-----|
@@ -390,41 +280,16 @@ Use different thinking depths for different stages:
 | Sage (verification) | `high` | Verification requires careful analysis |
 | Mirror (self-review) | `xhigh` | Self-review benefits from deepest thinking |
 
-### Fresh-Context Verification
+---
 
-Use a separate subagent with no prior context for final verification:
-- Catches issues that same-context self-review misses
-- Recommended for high-stakes, long-running, or complex tasks
-- Provides independent validation of the Mirror's findings
+## Long-Session Support
 
-### Progress Grounding
+For tasks that span multiple days:
 
-Every progress claim must cite a specific tool result:
-- "pytest exited 0 with 47 tests passing" (good)
-- "I believe it works" (rejected)
-- Eliminates fabricated status reports
-
-### Brevity Instructions
-
-Prevent over-elaboration at high effort settings:
-- Lead with outcomes, not process
-- Be selective about what you include
-- Drop details that don't change what the reader would do next
-
-### Fallback Handling
-
-Graceful degradation when Fable 5 refuses or fails:
-- Server-side and client-side fallback to Opus 4.8
-- Escalation to user with context when fallback fails
-- Prevention strategies to minimize refusals
-
-### Structured Memory
-
-Cross-session learning with structured memory files:
-- Lessons learned from past sessions
-- Corrections to wrong assumptions
-- Confirmed approaches that work
-- Failure patterns to avoid
+- **Checkpoint system**: Save progress after each stage passes
+- **Context compaction**: Summarize completed stages to free context
+- **Session resume**: Reconstruct state from checkpoint file
+- **Memory integration**: Persist verified facts and user preferences across sessions
 
 ---
 
@@ -475,6 +340,39 @@ See [`references/failure_paths.md`](references/failure_paths.md) for the complet
 
 ---
 
+## Quick Reference
+
+### When to Use
+
+| Task Complexity | Recommended Approach |
+|----------------|---------------------|
+| 1 file, 1 change | Normal execution |
+| 2-4 files, moderate risk | `fable mode lite` |
+| 5+ files, sequential steps | `fable mode` (basic) |
+| 8+ files, parallel possible | `fable mode full` |
+| Security-critical, high-risk | `fable mode full` + extra review |
+
+### Stage Plan Format
+
+```markdown
+### Stage N: [Name]
+
+- **Goal**: [what this stage achieves]
+- **Expected Output**: [concrete deliverable]
+- **Verification Check**: `[command]` — [pass condition]
+- **Dependencies**: [list of required stages]
+```
+
+### Final Proof Checklist
+
+- [ ] All stages pass their verification checks
+- [ ] Output-input chains verified (no orphan outputs)
+- [ ] Cross-stage consistency confirmed
+- [ ] Requirements traceability complete
+- [ ] No manual glue required
+
+---
+
 ## Examples
 
 | Example | Scenario | Stages | Mode |
@@ -487,15 +385,77 @@ Each example shows the complete fable mode workflow: gate evaluation, stage plan
 
 ---
 
-## When to Use Fable Mode
+## Project Structure
 
-| Task Complexity | Recommended Approach |
-|----------------|---------------------|
-| 1 file, 1 change | Normal execution |
-| 2-4 files, moderate risk | `fable mode lite` |
-| 5+ files, sequential steps | `fable mode` (basic) |
-| 8+ files, parallel possible | `fable mode full` |
-| Security-critical, high-risk | `fable mode full` + extra review |
+```
+fable-mode/
+├── SKILL.md                              # Core skill definition (450+ lines)
+├── README.md                             # This file
+│
+├── agents/
+│   ├── cartographer_agent.md             # Planning agent: stage decomposition + re-planning
+│   ├── blacksmith_agent.md               # Execution agent: run stages & checks + self-verification
+│   ├── sage_agent.md                     # Verification agent: Final Proof
+│   ├── mirror_agent.md                   # Self-review agent: skeptical check
+│   ├── researcher_agent.md               # Research specialist: sources, synthesis, contradictions
+│   ├── data_analyzer_agent.md            # Data specialist: schema, integrity, edge cases
+│   └── deployer_agent.md                 # Deployment specialist: environment, rollback, smoke tests
+│
+├── references/
+│   ├── check_types_by_domain.md          # Verification patterns (code/research/data/visual)
+│   ├── gate_protocol.md                  # When to enter/exit fable mode
+│   ├── failure_paths.md                  # 15 failure scenarios with recovery
+│   ├── parallel_delegation_guide.md      # How to dispatch parallel stages
+│   ├── verification_examples.md          # 25+ concrete check examples (including vision & self-verification)
+│   ├── fallback_guide.md                 # Handling refusals and fallback mechanisms
+│   ├── memory_system.md                  # Cross-session learning and memory structure
+│   └── changelog.md                      # Version history
+│
+├── templates/
+│   ├── stage_plan_template.md            # Fillable stage plan format (with checkpoint fields)
+│   ├── final_proof_template.md           # Final proof checklist
+│   └── delivery_summary_template.md      # Delivery summary format
+│
+└── examples/
+    ├── multi_file_refactor.md            # Code refactor example (5 stages)
+    ├── api_migration.md                  # API migration with parallel delegation
+    └── research_project.md               # Research/writing project example
+```
+
+23 files. 4,000+ lines. 8 categories.
+
+---
+
+## Changelog
+
+### v2.1.1 (2026-06-24)
+- Updated sage_agent.md with effort control and progress grounding
+- Added send-to-user tool pattern for mid-task communication
+- Updated examples with Researcher agent delegation
+- Fixed SKILL.md References table (added fallback_guide.md, memory_system.md)
+
+### v2.1.0 (2026-06-24)
+- Fresh-context verification (separate subagent for final review)
+- Structured memory system (`.fable/memory/` with lessons, corrections, approaches)
+- Progress grounding (every claim must cite tool evidence)
+- Brevity instructions (prevent over-elaboration)
+- Fallback handling (server-side, client-side, manual escalation)
+- Task budgets (max iterations, max time, max API calls per stage)
+- Send-to-user tool (communication with user during execution)
+
+### v2.0.0 (2026-06-24)
+- 3 new agents: Researcher, DataAnalyzer, Deployer
+- Vision verification (screenshot comparison, design fidelity, accessibility)
+- Self-verification (write-your-own-tests, reasoning re-derivation)
+- Dynamic re-planning (revise plans when evidence contradicts)
+- Long-session support (checkpoints, context compaction, session resume)
+- Memory integration (cross-session learning)
+
+### v1.0.0 (2026-06-23)
+- Initial published release
+- 3 modes: basic, full, lite
+- 4 agents: Cartographer, Blacksmith, Sage, Mirror
+- 6 reference documents, 3 templates, 3 examples
 
 ---
 
