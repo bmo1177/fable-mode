@@ -460,6 +460,40 @@ Confidence: [high/medium/low]
 Last verified: [timestamp]
 ```
 
+### Send-to-User Tool
+
+Use Fable 5's `send_to_user` tool to communicate with the user during execution:
+
+**When to use:**
+- Blocked on a decision that requires user input
+- Major milestone reached (e.g., "Stage 3 complete, proceeding to Stage 4")
+- Error encountered that requires user decision (e.g., "Test failed — fix now or skip?")
+- Deliverable ready for review
+
+**When NOT to use:**
+- Minor status updates (use progress grounding instead)
+- Questions that can be answered by continuing exploration
+- Requests for permission to proceed (assume autonomy unless blocked)
+
+**Pattern:**
+```
+send_to_user(
+  subject: "[Decision needed] API endpoint design",
+  body: "Two approaches found:
+    A) REST with /api/v1/users (traditional)
+    B) GraphQL with /api/graphql (flexible)
+    
+    Recommendation: B (matches existing schema)
+    
+    Please confirm A or B."
+)
+```
+
+**Response handling:**
+- If user responds: incorporate into next stage
+- If user doesn't respond: continue with best judgment, document assumption
+- If user declines: adjust plan, re-run affected stages
+
 ---
 
 ## References
@@ -477,7 +511,9 @@ Last verified: [timestamp]
 | `references/gate_protocol.md` | Gate conditions in detail |
 | `references/failure_paths.md` | Complete failure path map |
 | `references/parallel_delegation_guide.md` | Parallel delegation patterns |
-| `references/verification_examples.md` | 10+ concrete check examples |
+| `references/verification_examples.md` | 20+ concrete check examples (including vision & self-verification) |
+| `references/fallback_guide.md` | Handling refusals and fallback mechanisms |
+| `references/memory_system.md` | Cross-session learning and memory structure |
 | `references/changelog.md` | Version history |
 | `templates/stage_plan_template.md` | Fillable stage plan format |
 | `templates/final_proof_template.md` | Final proof checklist |

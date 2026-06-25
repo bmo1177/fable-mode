@@ -23,6 +23,11 @@ recommendations. Output as a Markdown document.
 - **Risk**: Accuracy matters, sources must be credible, structure must be coherent. ✓
 - **Verdict**: Gate opens. Proceed to planning.
 
+**Researcher Agent** available for:
+- Source verification and credibility grading
+- Literature synthesis and contradiction detection
+- Cross-source validation
+
 ---
 
 ## Rite the First: The Cartographer's Map
@@ -32,10 +37,11 @@ recommendations. Output as a Markdown document.
 ```markdown
 # Stage Plan: AI in Higher Education Research Report
 
-**Date**: 2026-06-23
+**Date**: 2026-06-24
 **Mode**: basic
 **Total Stages**: 6
 **Estimated Complexity**: Medium
+**Effort**: high (planning and verification stages)
 
 ---
 
@@ -54,6 +60,7 @@ recommendations. Output as a Markdown document.
 - **Expected Output**: sources.md with annotated bibliography (title, author, year, key finding, credibility grade)
 - **Verification Check**: `grep -c "^\*\*Source" sources.md` — output ≥ 15
 - **Dependencies**: Stage 1
+- **Agent**: Researcher (source verification specialist)
 
 ### Stage 3: Source verification and quality grading
 
@@ -61,6 +68,7 @@ recommendations. Output as a Markdown document.
 - **Expected Output**: Updated sources.md with credibility grades and verification notes
 - **Verification Check**: `grep -c "Grade:" sources.md` — output ≥ 15 (all sources graded)
 - **Dependencies**: Stage 2
+- **Agent**: Researcher (source verification specialist)
 
 ### Stage 4: Analysis and synthesis
 
@@ -68,6 +76,7 @@ recommendations. Output as a Markdown document.
 - **Expected Output**: analysis.md with thematic synthesis, evidence mapping, gap analysis
 - **Verification Check**: `wc -l analysis.md` — output ≥ 200 (substantial analysis)
 - **Dependencies**: Stage 3
+- **Agent**: Researcher (synthesis specialist)
 
 ### Stage 5: Report drafting
 
@@ -119,16 +128,19 @@ Stage 1 ------------------------------------------> Stage 5 (Stage 1, Stage 4)
 **Stage 2**: Literature search
 - Collects 18 sources from academic databases, government reports, and reputable think tanks.
 - Creates sources.md with annotated bibliography.
+- **Agent**: Researcher (source collection specialist)
 - **Check**: `grep -c "^\*\*Source" sources.md` → 18 ≥ 15 ✓ PASS
 
 **Stage 3**: Source verification
 - Grades all 18 sources (12 Level I-II, 4 Level III, 2 Level IV).
 - Flags 1 source as potentially predatory, replaces with better alternative.
+- **Agent**: Researcher (source verification specialist)
 - **Check**: `grep -c "Grade:" sources.md` → 18 ≥ 15 ✓ PASS
 
 **Stage 4**: Analysis and synthesis
 - Identifies 4 major themes, 2 contradictions, 3 gaps.
 - Produces thematic synthesis with evidence mapping.
+- **Agent**: Researcher (synthesis specialist)
 - **Check**: `wc -l analysis.md` → 247 ≥ 200 ✓ PASS
 
 **Stage 5**: Report drafting
@@ -143,7 +155,7 @@ Stage 1 ------------------------------------------> Stage 5 (Stage 1, Stage 4)
 
 ## Rite the Third: The Proof of Deeds (Final Proof)
 
-**Sage Agent** conducts Final Proof:
+**Sage Agent** conducts Final Proof (effort: high):
 
 - **Stage Results**: 6/6 PASS
 - **Integration Validation**: Report follows outline structure, analysis supports report claims, all sources cited
@@ -155,7 +167,7 @@ Stage 1 ------------------------------------------> Stage 5 (Stage 1, Stage 4)
 
 ## Rite the Fourth: The Mirror of the Guild
 
-**Mirror Agent** self-review:
+**Mirror Agent** self-review (effort: high, fresh-context verification):
 
 1. **Hidden Complexity**: None found.
 2. **Environment Assumptions**: None — all work is self-contained.
@@ -168,6 +180,25 @@ Stage 1 ------------------------------------------> Stage 5 (Stage 1, Stage 4)
 
 ---
 
+## Memory: Lessons Learned
+
+After delivery, lessons are recorded in `.fable/memory/`:
+
+```
+lessons:
+  - "Source verification is critical for research projects — always assign Researcher agent"
+  - "18 sources provided good coverage — 15-25 is the sweet spot"
+  - "Stage 6 (quality check) caught 1 structural inconsistency — always include a review stage"
+
+corrections:
+  - "Stage 2 check used '^\*\*Source' pattern — ensure consistent source formatting"
+
+approaches:
+  - "Research projects: Stages 2-4 benefit from Researcher agent delegation"
+```
+
+---
+
 ## Delivery
 
 ```markdown
@@ -175,7 +206,7 @@ Stage 1 ------------------------------------------> Stage 5 (Stage 1, Stage 4)
 
 **Task**: Research report on AI in higher education quality assurance
 **Mode**: basic
-**Date**: 2026-06-23
+**Date**: 2026-06-24
 **Total Stages**: 6
 **All Checks Passed**: YES
 
@@ -187,14 +218,14 @@ Produced a complete research report on AI's impact on higher education quality a
 
 ### Stages Completed
 
-| Stage | Output | Verification |
-|-------|--------|-------------|
-| Stage 1: Scope & outline | 7-section outline, 3 research questions | PASS |
-| Stage 2: Literature search | 18 annotated sources | PASS |
-| Stage 3: Source verification | All sources graded, 1 predatory replaced | PASS |
-| Stage 4: Analysis | 4 themes, 2 contradictions, 3 gaps | PASS |
-| Stage 5: Report draft | 623-line complete report | PASS |
-| Stage 6: Quality check | 22 citations, structure verified | PASS |
+| Stage | Output | Verification | Agent |
+|-------|--------|-------------|-------|
+| Stage 1: Scope & outline | 7-section outline, 3 research questions | PASS | Cartographer |
+| Stage 2: Literature search | 18 annotated sources | PASS | Researcher |
+| Stage 3: Source verification | All sources graded, 1 predatory replaced | PASS | Researcher |
+| Stage 4: Analysis | 4 themes, 2 contradictions, 3 gaps | PASS | Researcher |
+| Stage 5: Report draft | 623-line complete report | PASS | Blacksmith |
+| Stage 6: Quality check | 22 citations, structure verified | PASS | Blacksmith |
 
 ---
 
@@ -226,6 +257,8 @@ Produced a complete research report on AI's impact on higher education quality a
 - **Gate**: Passed (research + analysis + writing)
 - **Cartographer**: Plan with 6 stages, sequential execution
 - **Blacksmith**: All 6 stages passed
-- **Sage**: Final Proof passed
-- **Mirror**: Self-review clean
+- **Sage**: Final Proof passed (effort: high)
+- **Mirror**: Self-review clean (fresh-context verification)
+- **Researcher**: Source verification, synthesis, contradiction detection
+- **Memory**: Lessons recorded for future research projects
 ```

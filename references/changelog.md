@@ -11,6 +11,68 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.1.0] - 2026-06-24
+
+### Added
+
+- **Fresh-context verification** — Mirror and Sage can run as separate subagents with fresh context (no shared biases).
+- **Structured memory system** — Cross-session learning in `.fable/memory/` with lessons, corrections, approaches, failures.
+- **Progress grounding** — Every claim must cite specific tool evidence (no "should work").
+- **Brevity instructions** — Prevent over-elaboration and unnecessary preamble.
+- **Fallback handling** — Server-side refusals, client-side rate limits, manual escalation paths.
+- **Task budgets** — Max iterations, max time, max API calls per stage (with escalation).
+- **Send-to-user tool** — Communication with user during execution for decisions, clarifications.
+
+### Changed
+
+- SKILL.md updated with new Fable 5 integration patterns.
+
+### Removed
+
+- None.
+
+### Version
+
+- 2.1.0 (fresh-context verification, structured memory, progress grounding).
+
+---
+
+## [2.0.0] - 2026-06-24
+
+### Added
+
+- **3 new agents**:
+  - `researcher_agent` — Research specialist with source verification, synthesis, contradiction detection.
+  - `data_analyzer_agent` — Data specialist with schema validation, integrity checks, edge cases.
+  - `deployer_agent` — Deployment specialist with environment checks, rollback, smoke tests.
+- **Vision verification** — Screenshot comparison, design fidelity, accessibility checks.
+- **Self-verification** — Write-your-own-tests, reasoning re-derivation, output-against-goal.
+- **Dynamic re-planning** — Cartographer revises plans when evidence contradicts assumptions.
+- **Long-session support** — Checkpoint system, context compaction, session resume.
+- **Memory integration** — `.fable/` directory structure with context, plan, proof, delivery, memory.
+- **Effort control** — Different thinking depth for different stages (high/xhigh for planning/review, medium/high for execution).
+
+### Changed
+
+- SKILL.md rewritten with 7-agent team, Mermaid diagrams, Fable 5 integration.
+- `cartographer_agent.md` updated with dynamic re-planning and context budget management.
+- `blacksmith_agent.md` updated with self-verification, effort control, fresh-context verification.
+- `mirror_agent.md` updated with fresh-context verification and effort control.
+- `README.md` rewritten with Mermaid diagrams, agent team section, Fable 5 integration.
+- `verification_examples.md` expanded from 15 to 25+ examples (including vision & self-verification).
+- `failure_paths.md` expanded from 12 to 15 failure scenarios.
+- `gate_protocol.md` updated with long-horizon task detection.
+
+### Removed
+
+- None.
+
+### Version
+
+- 2.0.0 (3 new agents, vision verification, self-verification, dynamic re-planning, long-session support).
+
+---
+
 ## [1.0.0] - 2026-06-23
 
 ### Added
