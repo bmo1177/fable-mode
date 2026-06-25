@@ -31,21 +31,27 @@ This is the standard output format for the Cartographer Agent. Fill in all field
 - **Goal**: [What this stage accomplishes]
 - **Expected Output**: [Concrete output — file, test result, data structure]
 - **Verification Check**: [Exact command or method]
+- **Check Type**: [standard / vision / self-verification]
 - **Dependencies**: none
+- **Domain**: [code / research / data / deployment / visual]
 
 ### Stage 2: [Stage Name]
 
 - **Goal**: [What this stage accomplishes]
 - **Expected Output**: [Concrete output]
 - **Verification Check**: [Exact command or method]
+- **Check Type**: [standard / vision / self-verification]
 - **Dependencies**: Stage 1
+- **Domain**: [code / research / data / deployment / visual]
 
 ### Stage 3: [Stage Name]
 
 - **Goal**: [What this stage accomplishes]
 - **Expected Output**: [Concrete output]
 - **Verification Check**: [Exact command or method]
+- **Check Type**: [standard / vision / self-verification]
 - **Dependencies**: Stage 2
+- **Domain**: [code / research / data / deployment / visual]
 
 [Add more stages as needed]
 
@@ -88,6 +94,25 @@ Stage 4 (none) -------------------------->+
 - [ ] Final Proof is defined
 
 **Status**: [Pending / Accepted / Rejected]
+
+---
+
+## Checkpoint (for long sessions)
+
+If this task spans multiple sessions, save checkpoints after each stage:
+
+```markdown
+# Checkpoint: [Task Name]
+**Saved**: [timestamp]
+**Current Stage**: [N of M]
+**Completed Stages**:
+- Stage 1: [name] — PASS (evidence: [key output])
+- Stage 2: [name] — PASS (evidence: [key output])
+**Context Summary**: [compressed summary of decisions and progress]
+**Pending**: [next stage name and goal]
+```
+
+Resume from checkpoint: Read the checkpoint file, verify completed stages are still valid, continue from pending stage.
 ```
 
 ---

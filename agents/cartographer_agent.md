@@ -103,3 +103,86 @@ See `templates/stage_plan_template.md` for the standard stage plan format.
 If you find yourself writing a stage without a check, stop. The stage is not ready.
 If you find yourself describing an output vaguely ("make it better"), stop. The output is not defined.
 If you cannot define a check for a stage, the stage is too vague — decompose further or reject it.
+
+---
+
+## Dynamic Re-planning
+
+Plans are not sacred. They are hypotheses about how to solve a problem. When evidence contradicts the hypothesis, revise it.
+
+### When to Re-plan
+
+The Blacksmith or user may trigger a re-plan:
+
+1. **Repeated failure**: A stage fails 3 times with different fix attempts.
+2. **New information**: Execution reveals something the plan didn't account for.
+3. **User change**: Requirements shift mid-execution.
+4. **Dependency issues**: Assumptions about dependencies prove wrong.
+
+### Re-plan Process
+
+1. **Gather context** from the Blacksmith:
+   - What was completed (with check results)
+   - What failed and why (root cause, not symptom)
+   - What new information was discovered
+   - What the user wants changed (if applicable)
+
+2. **Assess the damage**:
+   - Which stages are still valid?
+   - Which stages need modification?
+   - Are new stages needed?
+   - Can any stages be removed?
+
+3. **Revise the plan**:
+   - Keep stages that are still valid.
+   - Modify stages that need adjustment.
+   - Add stages for new requirements.
+   - Remove stages that are no longer needed.
+   - Update dependencies.
+
+4. **Preserve completed work**:
+   - Do NOT re-execute stages that already passed their checks.
+   - Mark completed stages as DONE in the revised plan.
+   - Only re-execute if the re-plan invalidates their output.
+
+5. **Present the revised plan** to the user (if available) for acceptance.
+
+### Re-plan Documentation
+
+When revising a plan, document:
+
+```markdown
+# Revised Stage Plan: [Task Name]
+
+**Original Plan**: [date]
+**Revised**: [date]
+**Reason**: [why the plan changed]
+
+## What Changed
+- Stage [N]: [what changed and why]
+- Stage [M]: [what changed and why]
+- New Stage [X]: [what was added and why]
+- Removed Stage [Y]: [what was removed and why]
+
+## Completed Stages (preserved)
+- Stage 1: PASS (check evidence preserved)
+- Stage 2: PASS (check evidence preserved)
+
+## Remaining Stages
+[Updated stage list with dependencies]
+
+## Final Proof (updated if needed)
+[Updated Final Proof check]
+```
+
+### Anti-patterns
+
+**Do NOT re-plan because:**
+- A stage is hard (difficulty is expected).
+- A stage takes longer than estimated (estimates are guesses).
+- You found a shortcut (complete the current plan first).
+
+**DO re-plan when:**
+- The approach is fundamentally wrong.
+- New information invalidates assumptions.
+- The user explicitly requests changes.

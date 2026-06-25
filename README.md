@@ -1,6 +1,6 @@
 <p align="center">
   <br>
-  <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version">
+  <img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version">
   <img src="https://img.shields.io/badge/status-active-brightgreen" alt="Status">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   <img src="https://img.shields.io/badge/platform-OpenCode%20|%20Claude%20Code-lightgrey" alt="Platform">
@@ -51,13 +51,18 @@ graph LR
 |---------|-------------|
 | Gate Check | Refuses to activate on trivial tasks. No overhead where discipline isn't needed. |
 | 3 Modes | `basic` (sequential), `full` (parallel delegation), `lite` (lightweight) |
-| 4 Agents | Cartographer, Blacksmith, Sage, Mirror. Each has defined roles and boundaries. |
+| 7 Agents | Cartographer, Blacksmith, Sage, Mirror, Researcher, DataAnalyzer, Deployer |
 | Stage Planning | Every task decomposed into stages with concrete outputs and verification checks |
 | Verification Checks | Every check is a command that can pass or fail. No "looks good to me." |
+| Vision Verification | Screenshot comparison, design fidelity, accessibility checks using Fable 5 vision |
+| Self-Verification | Write-your-own-tests, reasoning re-derivation, output-against-goal |
+| Dynamic Re-planning | Revise plans when evidence contradicts the hypothesis |
+| Long-Session Support | Checkpoint system, context compaction, session resume for multi-day tasks |
+| Memory Integration | Cross-session memory for verified facts and user preferences |
 | Final Proof | Validates that all stages integrate and requirements are met before delivery |
 | Self-Review | Mirror agent catches hidden complexity, assumptions, and weakened checks |
 | Failure Paths | 12 documented failure scenarios with recovery strategies |
-| Domain-Agnostic | Works for code, research, data, and multi-step tasks |
+| Domain-Agnostic | Works for code, research, data, deployment, and visual tasks |
 
 ---
 
@@ -243,6 +248,9 @@ Bad check:
 | Blacksmith | Executes stages, runs checks, handles failures | Rite the Second + Third |
 | Sage | Final Proof of Deeds. Validates integration and requirements. | Rite the Third (final) |
 | Mirror | Self-review. Catches hidden complexity and process flaws. | Rite the Fourth |
+| Researcher | Literature search, source verification, synthesis | When Blacksmith delegates research stages |
+| DataAnalyzer | Schema validation, data integrity, edge cases | When Blacksmith delegates data stages |
+| Deployer | Deployment checks, rollback, environment verification | When Blacksmith delegates deployment stages |
 
 Each agent has a defined scope and cannot cross into another agent's territory.
 
@@ -250,14 +258,21 @@ Each agent has a defined scope and cannot cross into another agent's territory.
 graph TD
     U[User] --> C[Cartographer]
     C -->|Stage Plan| B[Blacksmith]
+    B -->|Research| R[Researcher]
+    B -->|Data| D[DataAnalyzer]
+    B -->|Deploy| DP[Deployer]
     B -->|Execution Results| S[Sage]
     S -->|Final Proof| M[Mirror]
-    M -->|Self-Review| D[Delivery]
+    M -->|Self-Review| DL[Delivery]
 
     style C fill:#4a9eff,color:#fff
     style B fill:#ff6b6b,color:#fff
+    style R fill:#9b59b6,color:#fff
+    style D fill:#e67e22,color:#fff
+    style DP fill:#1abc9c,color:#fff
     style S fill:#51cf66,color:#fff
     style M fill:#ffd43b,color:#000
+    style DL fill:#51cf66,color:#fff
 ```
 
 ---
@@ -266,25 +281,28 @@ graph TD
 
 ```
 fable-mode/
-├── SKILL.md                              # Core skill definition (326 lines)
+├── SKILL.md                              # Core skill definition (450+ lines)
 ├── README.md                             # This file
 │
 ├── agents/
-│   ├── cartographer_agent.md             # Planning agent: stage decomposition
-│   ├── blacksmith_agent.md               # Execution agent: run stages & checks
+│   ├── cartographer_agent.md             # Planning agent: stage decomposition + re-planning
+│   ├── blacksmith_agent.md               # Execution agent: run stages & checks + self-verification
 │   ├── sage_agent.md                     # Verification agent: Final Proof
-│   └── mirror_agent.md                  # Self-review agent: skeptical check
+│   ├── mirror_agent.md                  # Self-review agent: skeptical check
+│   ├── researcher_agent.md              # Research specialist: sources, synthesis, contradictions
+│   ├── data_analyzer_agent.md           # Data specialist: schema, integrity, edge cases
+│   └── deployer_agent.md               # Deployment specialist: environment, rollback, smoke tests
 │
 ├── references/
-│   ├── check_types_by_domain.md          # Verification patterns (code/research/data)
+│   ├── check_types_by_domain.md          # Verification patterns (code/research/data/visual)
 │   ├── gate_protocol.md                  # When to enter/exit fable mode
 │   ├── failure_paths.md                  # 12 failure scenarios with recovery
 │   ├── parallel_delegation_guide.md      # How to dispatch parallel stages
-│   ├── verification_examples.md          # 15+ concrete check examples
+│   ├── verification_examples.md          # 20+ concrete check examples (including vision & self-verification)
 │   └── changelog.md                      # Version history
 │
 ├── templates/
-│   ├── stage_plan_template.md            # Fillable stage plan format
+│   ├── stage_plan_template.md            # Fillable stage plan format (with checkpoint fields)
 │   ├── final_proof_template.md           # Final proof checklist
 │   └── delivery_summary_template.md      # Delivery summary format
 │
@@ -294,7 +312,59 @@ fable-mode/
     └── research_project.md               # Research/writing project example
 ```
 
-17 files. 2,652 lines. 6 categories.
+20 files. 3,500+ lines. 7 categories.
+
+---
+
+## What's New in v2.0
+
+Fable Mode v2.0 leverages Claude Fable 5's capabilities for enhanced execution:
+
+### 7 Agents (up from 4)
+
+The Blacksmith now delegates to domain specialists:
+
+| Specialist | Handles | Key Checks |
+|------------|---------|------------|
+| Researcher | Literature search, source verification | Source grading, contradiction detection, citation coverage |
+| DataAnalyzer | Schema validation, integrity checks | Row counts, referential integrity, edge cases |
+| Deployer | Deployment verification, rollback | Environment parity, smoke tests, health checks |
+
+### Vision-Based Verification
+
+Use Fable 5's vision capabilities to verify visual outputs:
+
+- **Screenshot comparison**: Compare rendered UI against reference design
+- **Design fidelity**: Verify component positions, colors, spacing
+- **Responsive layout**: Test at multiple viewport sizes
+- **Accessibility**: Check color contrast, keyboard navigation, ARIA labels
+
+### Self-Verification
+
+The Blacksmith can now verify its own work:
+
+- **Write your own test**: After implementing, write a test that exercises the implementation
+- **Reasoning re-derivation**: Solve twice independently, compare results
+- **Output-against-goal**: Compare final output against original requirements
+- **Code review**: Review own code as if reviewing a pull request
+
+### Dynamic Re-planning
+
+Plans are hypotheses, not sacred texts. When evidence contradicts the plan:
+
+- **Repeated failure**: Stage fails 3 times with different fix attempts
+- **New information**: Execution reveals something the plan didn't account for
+- **User change**: Requirements shift mid-execution
+- **Dependency issues**: Assumptions about dependencies prove wrong
+
+### Long-Session Support
+
+For tasks that span multiple days:
+
+- **Checkpoint system**: Save progress after each stage passes
+- **Context compaction**: Summarize completed stages to free context
+- **Session resume**: Reconstruct state from checkpoint file
+- **Memory integration**: Persist verified facts and user preferences across sessions
 
 ---
 

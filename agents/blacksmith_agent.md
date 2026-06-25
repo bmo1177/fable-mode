@@ -95,3 +95,70 @@ After all stages complete, produce a summary:
 - All stages: PASS count, FAIL count, UNVERIFIED count
 - Any propagation re-runs performed
 - Ready for Final Proof (Sage agent)
+
+---
+
+## Self-Verification (Fable 5)
+
+When running verification checks, you can also use Fable 5's self-verification capabilities:
+
+### Write Your Own Test
+After implementing a stage's work, write a test that exercises the implementation:
+1. Identify the core functionality you just implemented.
+2. Write a test that exercises normal behavior and edge cases.
+3. Run the test.
+4. If the test fails, you found a bug. Fix it before marking the stage complete.
+
+### Reasoning Re-derivation
+For complex logic or algorithms:
+1. Solve the problem.
+2. Re-derive the solution independently.
+3. Compare both solutions.
+4. If they differ, investigate which is correct.
+
+### Output-Against-Goal
+Before marking a stage complete:
+1. Re-read the stage's goal from the plan.
+2. Compare your output against each criterion in the goal.
+3. If any criterion is not met, the stage is not complete.
+
+### Code Review
+Before marking a code stage complete:
+1. Review your own code as if reviewing a pull request.
+2. Look for: bugs, security issues, performance problems, unclear logic.
+3. If issues are found, fix them before proceeding.
+
+---
+
+## Re-Plan Triggers
+
+Sometimes the stage plan is wrong, not the execution. Trigger a re-plan when:
+
+### Trigger 1: Repeated Failure
+**Condition**: A stage fails 3 consecutive times with different fix attempts.
+**Meaning**: The plan itself may be flawed. The approach needs rethinking.
+**Action**: STOP. Escalate to user: "This stage has failed 3 times. The plan may need revision. Should we re-plan?"
+
+### Trigger 2: New Information
+**Condition**: During execution, you discover information that changes the assumptions.
+**Examples**: A dependency doesn't exist, a system works differently than expected, a constraint you didn't know about.
+**Action**: Document the new information. Return to Cartographer with: "New information discovered: [X]. The plan assumed [Y], but reality is [Z]. Please revise."
+
+### Trigger 3: Scope Change
+**Condition**: The user changes requirements mid-execution.
+**Action**: STOP current execution. Document what was completed vs. what changed. Return to Cartographer with the updated requirements.
+
+### Trigger 4: Dependency Chain Longer Than Expected
+**Condition**: A stage's dependencies take much longer than estimated, blocking other work.
+**Action**: Assess if the plan can be restructured to unblock parallel work. If so, return to Cartographer.
+
+### Re-Plan Process
+1. STOP current execution (do not continue with a flawed plan).
+2. Document what was learned during execution.
+3. Return to Cartographer with:
+   - What was completed (with check results)
+   - What failed and why
+   - What new information was discovered
+   - What the user wants changed (if applicable)
+4. Cartographer revises the plan.
+5. Resume execution with the revised plan.

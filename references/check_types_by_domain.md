@@ -134,6 +134,45 @@ This document provides concrete verification check patterns for each domain that
 
 ---
 
+## Visual Verification Domain
+
+### Screenshot Comparison Checks
+
+| Check | Method | Pass Condition | Fail Condition |
+|-------|--------|----------------|----------------|
+| Layout match | Take screenshot, compare to reference | Visual similarity > 90% | Layout shifts detected |
+| Element presence | Capture rendered UI, check elements | All expected elements visible | Missing elements |
+| Color accuracy | Compare color values against design | Colors match within tolerance | Color mismatches |
+| Spacing validation | Measure gaps between elements | Spacing within 2px of design | Spacing exceeds tolerance |
+
+### Design Fidelity Checks
+
+| Check | Method | Pass Condition | Fail Condition |
+|-------|--------|----------------|----------------|
+| Component alignment | Compare positions against design file | Alignment within 4px | Misaligned components |
+| Typography | Check font, size, weight against spec | All text matches spec | Typography deviations |
+| Responsive behavior | Test at multiple viewport sizes | Layout adapts correctly | Breakage at any size |
+| Dark/light mode | Verify both themes render correctly | Both themes look correct | Theme-specific issues |
+
+### Accessibility Checks
+
+| Check | Method | Pass Condition | Fail Condition |
+|-------|--------|----------------|----------------|
+| Color contrast | Run axe-core or Lighthouse | WCAG AA compliance | Contrast violations |
+| Keyboard navigation | Test tab order and focus states | All interactive elements reachable | Focus traps or skips |
+| Screen reader | Verify ARIA labels and roles | All elements properly labeled | Missing or incorrect labels |
+| Alt text | Check images for alt attributes | All images have meaningful alt text | Missing or empty alt text |
+
+### Performance Visual Checks
+
+| Check | Method | Pass Condition | Fail Condition |
+|-------|--------|----------------|----------------|
+| Loading states | Monitor during page load | Skeletons/loading indicators present | Blank screens |
+| Animation smoothness | Record at 60fps, check for jank | Animations stay above 30fps | Visible stuttering |
+| Image rendering | Check images load and scale correctly | Images display without distortion | Blurry or broken images |
+
+---
+
 ## Choosing the Right Check
 
 When defining a check for your stage, ask:

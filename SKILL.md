@@ -8,8 +8,8 @@ description: >
   Trigger when the user explicitly asks ("fable mode" or "fable mode on") or requests Hero's Guild discipline.
   Do NOT trigger on single-step tasks, quick questions, brainstorming sessions, or when the user explicitly declines.
 metadata:
-  version: "1.0.0"
-  last_updated: "2026-06-23"
+  version: "2.0.0"
+  last_updated: "2026-06-24"
   status: active
   data_access_level: raw
   task_type: multi-step
@@ -27,6 +27,14 @@ A task execution framework that refuses to let agents work beneath their own sta
 - **Templates** — Stage plan, final proof, delivery summary
 - **Failure Paths** — What to do when checks fail, delegation fails, scope creeps
 - **Domain-Specific Checks** — Patterns for code, research, data, and multi-step tasks
+
+**v2.0** — Fable 5 enhanced release:
+- **7 Agents** — Added Researcher (research tasks), DataAnalyzer (data tasks), Deployer (deployment tasks)
+- **Vision Verification** — Screenshot comparison, design fidelity, accessibility checks
+- **Self-Verification** — Write-your-own-tests, reasoning re-derivation, output-against-goal
+- **Dynamic Re-planning** — Revise plans when evidence contradicts the hypothesis
+- **Long-Session Support** — Checkpoint system, context compaction, session resume
+- **Memory Integration** — Cross-session memory for verified facts and user preferences
 
 ---
 
@@ -107,7 +115,7 @@ User Input
 
 ---
 
-## Agent Team (4 Agents)
+## Agent Team (7 Agents)
 
 | # | Agent | Role | When Active |
 |---|-------|------|-------------|
@@ -115,6 +123,9 @@ User Input
 | 2 | `blacksmith_agent` | Executes each stage, runs verification checks, handles failures and retries | Rite the Second + Third |
 | 3 | `sage_agent` | Conducts the Final Proof of Deeds, validates cross-stage integration | Rite the Third (final) |
 | 4 | `mirror_agent` | Performs self-review, identifies hidden complexity, checks assumptions | Rite the Fourth |
+| 5 | `researcher_agent` | Handles literature search, source verification, synthesis | When Blacksmith delegates research stages |
+| 6 | `data_analyzer_agent` | Handles schema validation, data integrity, edge cases | When Blacksmith delegates data stages |
+| 7 | `deployer_agent` | Handles deployment checks, rollback, environment verification | When Blacksmith delegates deployment stages |
 
 ---
 
@@ -302,14 +313,78 @@ Use it when the quest demands it, and sheathe it when it does not.
 
 ---
 
+## Long-Session Support (Fable 5)
+
+For tasks that span multiple days or require context persistence across sessions.
+
+### Checkpoint System
+
+After each stage passes its check, save a checkpoint:
+
+```markdown
+# Checkpoint: [Task Name]
+**Saved**: [timestamp]
+**Current Stage**: [N of M]
+**Completed Stages**:
+- Stage 1: [name] — PASS (evidence: [key output])
+- Stage 2: [name] — PASS (evidence: [key output])
+**Context Summary**: [compressed summary of what's been done, decisions made, and what comes next]
+**Pending**: [next stage name and goal]
+**User Decisions**: [any user choices made during this session]
+```
+
+### Context Compaction
+
+When context window fills up:
+1. Summarize completed stages into a compact summary.
+2. Keep: stage names, check results, key outputs, user decisions.
+3. Drop: detailed execution logs, intermediate outputs.
+4. Save the summary to the checkpoint file.
+
+### Session Resume
+
+When resuming a paused session:
+1. Read the checkpoint file.
+2. Reconstruct context from the summary.
+3. Verify completed stages are still valid (files exist, checks still pass).
+4. Resume from the next pending stage.
+
+### Memory Integration
+
+Use Fable 5's memory tool to persist cross-session information:
+
+**What to remember:**
+- Verified facts (e.g., "project uses PostgreSQL 15, not 14")
+- User preferences (e.g., "user prefers functional style, no classes")
+- Failure patterns (e.g., "this test suite is flaky, retry twice")
+- Environment details (e.g., "CI runs on Ubuntu 22.04, Node 20")
+
+**What NOT to remember:**
+- Secrets or credentials
+- Temporary debugging information
+- Outdated assumptions that were corrected
+
+**Memory format:**
+```
+Fact: [what you learned]
+Source: [how you learned it — which stage, which check]
+Confidence: [high/medium/low]
+Last verified: [timestamp]
+```
+
+---
+
 ## References
 
 | Document | Purpose |
 |----------|---------|
-| `agents/cartographer_agent.md` | Planning agent — stage decomposition, check definition |
-| `agents/blacksmith_agent.md` | Execution agent — stage execution, verification |
+| `agents/cartographer_agent.md` | Planning agent — stage decomposition, check definition, dynamic re-planning |
+| `agents/blacksmith_agent.md` | Execution agent — stage execution, verification, self-verification, re-plan triggers |
 | `agents/sage_agent.md` | Verification agent — Final Proof of Deeds |
 | `agents/mirror_agent.md` | Self-review agent — skeptical quality check |
+| `agents/researcher_agent.md` | Research specialist — source verification, synthesis, contradiction detection |
+| `agents/data_analyzer_agent.md` | Data specialist — schema validation, integrity checks, edge cases |
+| `agents/deployer_agent.md` | Deployment specialist — environment checks, rollback, smoke tests |
 | `references/check_types_by_domain.md` | Verification check patterns by domain |
 | `references/gate_protocol.md` | Gate conditions in detail |
 | `references/failure_paths.md` | Complete failure path map |

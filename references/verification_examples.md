@@ -156,3 +156,78 @@ Pass condition: Exit 0, output contains "passed"
 Fail condition: Non-zero exit, output contains "FAILED" or "ERROR"
 Evidence: Exit code + count of passed/failed tests
 ```
+
+---
+
+## Vision-Based Checks (Fable 5)
+
+These checks leverage Claude Fable 5's vision capabilities to verify visual outputs.
+
+### Vision Check 1: Screenshot Comparison
+**Stage**: Update component styling
+**Check**: Take screenshot of rendered component, compare against reference design
+**Pass evidence**: Visual similarity score > 90%, all key elements present
+**Fail evidence**: Layout shifts, missing elements, color mismatches
+**Why it's vision**: Uses Fable 5's vision to compare actual rendering against expected design
+
+### Vision Check 2: Design Fidelity
+**Stage**: Implement new UI from Figma mockup
+**Check**: Capture rendered page, compare against Figma export
+**Pass evidence**: Component positions, sizes, and colors match within tolerance
+**Fail evidence**: Misaligned elements, incorrect spacing, wrong typography
+**Why it's vision**: Leverages visual understanding to verify pixel-level accuracy
+
+### Vision Check 3: Responsive Layout
+**Stage**: Make component responsive
+**Check**: Capture screenshots at 320px, 768px, 1024px, 1440px widths
+**Pass evidence**: Layout adapts correctly at all breakpoints
+**Fail evidence**: Overflow, truncation, or breakage at any width
+**Why it's vision**: Visual verification across multiple viewports
+
+### Vision Check 4: Accessibility Contrast
+**Stage**: Improve color contrast for WCAG compliance
+**Check**: Capture screenshot, visually verify text is readable against backgrounds
+**Pass evidence**: Text clearly readable, contrast appears sufficient
+**Fail evidence**: Text blends into background, hard to read
+**Why it's vision**: Visual assessment of readability
+
+---
+
+## Self-Verification Checks (Fable 5)
+
+These checks use Fable 5's self-verification capabilities to validate work without external tools.
+
+### Self-Verification 1: Write Your Own Test
+**Stage**: Implement a new function
+**Check**: After implementing, write a test that exercises the function with edge cases
+**Pass evidence**: Test passes, covering normal and edge cases
+**Fail evidence**: Test fails, revealing a bug in the implementation
+**Why it's self-verification**: The agent writes and runs its own test to verify correctness
+
+### Self-Verification 2: Reasoning Re-derivation
+**Stage**: Solve a complex algorithm problem
+**Check**: Re-derive the solution independently and compare against original
+**Pass evidence**: Both derivations produce identical results
+**Fail evidence**: Contradiction found between derivations
+**Why it's self-verification**: Agent checks its own reasoning by solving twice
+
+### Self-Verification 3: Output-Against-Goal
+**Stage**: Complete a multi-step task
+**Check**: Compare final output against original goal statement, criterion by criterion
+**Pass evidence**: All goal criteria satisfied with evidence
+**Fail evidence**: Missing criteria or insufficient evidence
+**Why it's self-verification**: Agent validates its own work against the original requirements
+
+### Self-Verification 4: Code Review
+**Stage**: Write a complex implementation
+**Check**: Review own code as if reviewing a pull request, looking for bugs and improvements
+**Pass evidence**: No issues found, or issues identified and fixed
+**Fail evidence**: Issues found but not yet fixed
+**Why it's self-verification**: Agent critiques its own work before declaring it done
+
+### Self-Verification 5: Dependency Check
+**Stage**: Implement a feature that depends on other modules
+**Check**: Verify that all assumptions about dependencies are correct
+**Pass evidence**: All dependency assumptions hold
+**Fail evidence**: Assumption violated, requiring implementation change
+**Why it's self-verification**: Agent validates its own assumptions before proceeding
