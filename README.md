@@ -1,6 +1,6 @@
 <p align="center">
   <br>
-  <img src="https://img.shields.io/badge/version-2.1.1-blue" alt="Version">
+  <img src="https://img.shields.io/badge/version-3.0.0-blue" alt="Version">
   <img src="https://img.shields.io/badge/status-active-brightgreen" alt="Status">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   <img src="https://img.shields.io/badge/platform-OpenCode%20|%20Claude%20Code-lightgrey" alt="Platform">
@@ -252,18 +252,22 @@ graph TD
 | 7 Agents | Cartographer, Blacksmith, Sage, Mirror, Researcher, DataAnalyzer, Deployer |
 | Stage Planning | Every task decomposed into stages with concrete outputs and verification checks |
 | Verification Checks | Every check is a command that can pass or fail. No "looks good to me." |
+| Construction-Time Validation | Checks validated as machine-verifiable before plan acceptance |
+| Scope Guard | Planned Files declared per stage; drift detection blocks unplanned modifications |
+| Bounce Targets | Per-stage re-entry target (same / Stage N / plan) for precise failure recovery |
+| Model-Tier Branching | Frontier → coarse stages, Local → fine-grained with explicit criteria |
+| Wave-Based DAG | Barrier-synchronized wave execution with resource conflict matrix |
+| Hash-Chained Audit Trail | SHA-256 chain in `.fable/trail/` — tampering breaks the chain |
+| Shadow Mode | `FABLE_SHADOW=1` — observe without enforcing (safe adoption path) |
+| Adversarial Review | Dual independent reviewer catches shared blind spots |
 | Vision Verification | Screenshot comparison, design fidelity, accessibility checks using Fable 5 vision |
 | Self-Verification | Write-your-own-tests, reasoning re-derivation, output-against-goal |
 | Dynamic Re-planning | Revise plans when evidence contradicts the hypothesis |
-| Effort Control | Different thinking depth for different stages (high/xhigh for planning, medium for execution) |
+| Effort Control | Different thinking depth for different stages |
 | Fresh-Context Verification | Separate verifier subagent for final review |
 | Progress Grounding | Every progress claim must cite tool evidence |
-| Brevity Instructions | Prevent over-elaboration, lead with outcomes |
-| Fallback Handling | Graceful degradation when Fable 5 refuses or fails |
 | Structured Memory | Lessons learned, corrections, confirmed approaches across sessions |
-| Long-Session Support | Checkpoint system, context compaction, session resume for multi-day tasks |
-| Final Proof | Validates that all stages integrate and requirements are met before delivery |
-| Self-Review | Mirror agent catches hidden complexity, assumptions, and weakened checks |
+| Long-Session Support | Checkpoint system, context compaction, session resume |
 | Failure Paths | 15 documented failure scenarios with recovery strategies |
 | Domain-Agnostic | Works for code, research, data, deployment, and visual tasks |
 
@@ -317,6 +321,9 @@ These rules always apply, no exceptions:
 | F6 | Scope creep | Freeze scope, finish current plan |
 | F7 | Tool unavailable | Mark UNVERIFIED, flag explicitly |
 | F8 | Flaw found after delivery | Recall, fix, re-deliver |
+| F9 | Scope drift detected | Revert unplanned changes or revise plan |
+| F10 | Bounce target chain too long | Re-plan dependencies, shorten chain |
+| F11 | Audit trail broken | Stop — tampering detected |
 
 ```mermaid
 graph TD
@@ -389,14 +396,14 @@ Each example shows the complete fable mode workflow: gate evaluation, stage plan
 
 ```
 fable-mode/
-├── SKILL.md                              # Core skill definition (450+ lines)
+├── SKILL.md                              # Core skill definition (540+ lines)
 ├── README.md                             # This file
 │
 ├── agents/
 │   ├── cartographer_agent.md             # Planning agent: stage decomposition + re-planning
-│   ├── blacksmith_agent.md               # Execution agent: run stages & checks + self-verification
+│   ├── blacksmith_agent.md               # Execution agent: stage execution + scope guard + bounce targets
 │   ├── sage_agent.md                     # Verification agent: Final Proof
-│   ├── mirror_agent.md                   # Self-review agent: skeptical check
+│   ├── mirror_agent.md                   # Self-review agent: adversarial review protocol
 │   ├── researcher_agent.md               # Research specialist: sources, synthesis, contradictions
 │   ├── data_analyzer_agent.md            # Data specialist: schema, integrity, edge cases
 │   └── deployer_agent.md                 # Deployment specialist: environment, rollback, smoke tests
@@ -404,15 +411,17 @@ fable-mode/
 ├── references/
 │   ├── check_types_by_domain.md          # Verification patterns (code/research/data/visual)
 │   ├── gate_protocol.md                  # When to enter/exit fable mode
-│   ├── failure_paths.md                  # 15 failure scenarios with recovery
-│   ├── parallel_delegation_guide.md      # How to dispatch parallel stages
-│   ├── verification_examples.md          # 25+ concrete check examples (including vision & self-verification)
+│   ├── failure_paths.md                  # 15 failure scenarios with recovery (F1-F15)
+│   ├── parallel_delegation_guide.md      # How to dispatch parallel stages + wave-based DAG
+│   ├── verification_examples.md          # 25+ concrete check examples
+│   ├── audit_trail.md                    # Hash-chained evidence ledger with SHA-256
+│   ├── shadow_mode.md                    # Non-blocking observation mode for safe adoption
 │   ├── fallback_guide.md                 # Handling refusals and fallback mechanisms
 │   ├── memory_system.md                  # Cross-session learning and memory structure
 │   └── changelog.md                      # Version history
 │
 ├── templates/
-│   ├── stage_plan_template.md            # Fillable stage plan format (with checkpoint fields)
+│   ├── stage_plan_template.md            # Fillable stage plan format (with planned files + badges)
 │   ├── final_proof_template.md           # Final proof checklist
 │   └── delivery_summary_template.md      # Delivery summary format
 │
@@ -422,17 +431,23 @@ fable-mode/
     └── research_project.md               # Research/writing project example
 ```
 
-23 files. 4,000+ lines. 8 categories.
+25 files. 5,000+ lines. 10 categories.
 
 ---
 
 ## Changelog
 
-### v2.1.1 (2026-06-24)
-- Updated sage_agent.md with effort control and progress grounding
-- Added send-to-user tool pattern for mid-task communication
-- Updated examples with Researcher agent delegation
-- Fixed SKILL.md References table (added fallback_guide.md, memory_system.md)
+### v3.0.0 (2026-07-17)
+- Hash-chained audit trail (`.fable/trail/chain.audit.jsonl` with SHA-256)
+- Scope guard (planned files + drift detection)
+- Construction-time validation (check integrity before plan acceptance)
+- Shadow mode (`FABLE_SHADOW=1` — observe without enforcing)
+- Bounce targets (per-stage re-entry on failure)
+- Model-tier branching (frontier vs local decomposition)
+- Wave-based DAG execution (barrier-synchronized batches)
+- Adversarial review (dual independent reviewer)
+- Status badge system (per-stage STAGE STATUS tracking)
+- 3 new failure paths (scope drift, audit trail break, bounce chain)
 
 ### v2.1.0 (2026-06-24)
 - Fresh-context verification (separate subagent for final review)
