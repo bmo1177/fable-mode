@@ -150,6 +150,88 @@ Use fresh-context verification for:
 - The Mirror found and fixed issues
 - The user explicitly requests it
 
+---
+
+## Adversarial Review Mode
+
+Adversarial review uses a **dual independent reviewer** pattern where a second agent with no context of the implementation reviews the output purely against the original requirements. This catches assumptions that the primary reviewer and implementer both share.
+
+### When to Use Adversarial Review
+
+| Scenario | Why Adversarial |
+|----------|-----------------|
+| Security-critical changes | Shared blind spots are dangerous |
+| High-complexity tasks (> 10 stages) | More integration points = more hidden assumptions |
+| After a failed Final Proof | The initial approach may have systematic flaws |
+| Cross-domain work (e.g., code + infra) | Different reviewers catch different domain issues |
+| When the Mirror is uncertain | "I think it's clean but I'm not sure" → get a second opinion |
+
+### Dual Reviewer Protocol
+
+```
+Reviewer 1 (Mirror): Has full context of implementation
+  - Reviews with knowledge of the stage plan, execution, and checks
+  - Catches issues related to process, check integrity, scope adherence
+
+Reviewer 2 (Adversarial): Has NO context of implementation
+  - Receives only: original task + final output + verification evidence
+  - Reviews independently of how the work was done
+  - Catches: hidden assumptions, missing requirements, alternative approaches
+
+Comparison step: Compare findings from both reviewers
+  - If both agree → proceed
+  - If Reviewer 2 finds issues Reviewer 1 missed → fix, then retrain Reviewer 1's biases
+  - If Reviewer 1 finds issues Reviewer 2 missed → add to adversarial checklist
+```
+
+### Adversarial Review Template
+
+```markdown
+# Adversarial Review — Independent Assessment
+
+## Dispatched With
+1. Original task description (ONLY — no stage plan, no execution context)
+2. Final output (what was produced)
+3. Verification evidence (check outputs only — not the process)
+
+## Review Questions
+1. Does this output fully satisfy the original task description?
+2. Are there any requirements that appear unmet or partially met?
+3. Are there assumptions in the output that might not hold in the user's environment?
+4. Is the verification evidence sufficient to prove the output is correct?
+5. What would you change or flag?
+
+## Findings
+[Independent assessment — may overlap or disagree with the Mirror]
+
+## Reconciliation
+- Findings that match the Mirror: [list — these are high-confidence issues]
+- Findings unique to Adversarial Reviewer: [list — investigate each]
+- Findings unique to the Mirror (missed by Adversarial): [list — review if relevant]
+
+## Final Verdict
+[CLEAN / ISSUES FOUND / RECOMMEND REJECTION]
+```
+
+### Reconciliation Process
+
+When the Mirror and Adversarial reviewer disagree:
+
+1. **Both flag an issue** → High confidence. Fix it.
+2. **Only Adversarial flags an issue** → The Mirror had implementation bias. Investigate and fix.
+3. **Only Mirror flags an issue** → The Adversarial lacked process context. The Mirror's finding likely stands — fix it.
+4. **Neither flags an issue** → Clean. Proceed to delivery.
+
+### Integration with Fresh-Context Verification
+
+For maximum rigor, combine adversarial review with fresh-context verification:
+
+1. **Mirror**: Full-context self-review (process + output).
+2. **Fresh-Context Verifier**: Dispatched subagent with no prior context (sees plan + output + evidence).
+3. **Adversarial Reviewer**: No context of plan OR implementation — sees only task + output.
+
+This three-layer review catches process flaws, shared blind spots, and hidden assumptions.
+
 ## Output Format
 
 ```

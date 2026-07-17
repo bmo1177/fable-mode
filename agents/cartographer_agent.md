@@ -50,7 +50,29 @@ Before decomposing the task, check memory for relevant lessons:
 3. Read `.fable/memory/user_prefs.md` for user preferences.
 4. Incorporate lessons into the stage plan.
 
-### Step 3: Effort Recommendation
+### Step 3: Model-Tier Assessment
+
+Assess the model tier and adjust planning granularity:
+
+| Model Tier | Examples | Decomposition Granularity |
+|------------|----------|--------------------------|
+| **frontier** | Claude Opus 4.x, Claude Sonnet 4.x, GPT-4.5+ | Coarse stages (broader scope per stage) |
+| **local** | Claude Haiku, GPT-4o-mini, Llama, Phi | Fine-grained stages (smaller, single-responsibility steps with explicit acceptance criteria per stage) |
+
+**Frontier mode** (default):
+- Stages can span multiple files and logical actions if they are tightly related.
+- Dependencies can be implicit when the connection is obvious.
+- Verification checks can be higher-level (e.g., "full test suite passes").
+
+**Local mode**:
+- Each stage must be a single, focused action.
+- Explicit acceptance criteria required per stage (not just a verification check).
+- Dependencies must be explicit with documented output contracts.
+- Verification checks must be narrow and specific to the stage's output.
+
+Include the model tier in the stage plan metadata.
+
+### Step 4: Effort Recommendation
 
 For each stage, recommend an effort level based on complexity:
 
@@ -69,11 +91,13 @@ Include the effort recommendation in the stage plan:
 ### Stage N: [Stage Name]
 - **Goal**: [What this stage accomplishes]
 - **Expected Output**: [Concrete output]
+- **Planned Files**: [Exact file paths this stage will touch]
 - **Verification Check**: [Exact command or method]
 - **Check Type**: [standard / vision / self-verification]
 - **Dependencies**: [none or Stage N]
 - **Domain**: [code / research / data / deployment / visual]
 - **Recommended Effort**: [medium / high / xhigh]
+- **Bounce Target**: [same / Stage N / plan]
 ```
 
 ### Step 2: Task Decomposition
@@ -100,7 +124,38 @@ For each stage, define a verification check that is:
 - *Data*: Row count matches expected, schema constraints pass, edge cases covered
 - *Multi-step*: Each output consumed by next stage without manual glue
 
-### Step 4: Dependency Mapping
+### Step 4: Scope Declaration
+
+For each stage, declare all files the stage is expected to create or modify:
+
+```markdown
+- **Planned Files**: src/auth/login.ts, src/auth/session.ts
+```
+
+**Rules:**
+- Be specific. `src/auth/*.ts` is acceptable for bulk changes. `src/` is too broad.
+- If a stage modifies files outside the planned list, the Blacksmith will flag it as scope drift.
+- Documentation files (README, CHANGELOG) should also be listed if modified.
+- Do NOT list files from dependencies — only files this stage directly touches.
+
+### Step 5: Bounce Target Definition
+
+For each stage, define where to re-enter on failure:
+
+```markdown
+- **Bounce Target**: same (default — re-run this stage)
+- **Bounce Target**: Stage 1 (re-enter at an earlier stage)
+- **Bounce Target**: plan (re-enter at the Cartographer for re-planning)
+```
+
+**Rules:**
+- `same` — Re-run the current stage with failure context injected (default).
+- `Stage N` — Re-enter at Stage N (must be an ancestor in the dependency graph).
+- `plan` — Return to Cartographer for full re-planning.
+- Bounce targets must not create cycles in the execution flow.
+- The Blacksmith may override the bounce target if the failure evidence points elsewhere.
+
+### Step 6: Dependency Mapping
 
 For each stage, specify:
 - `Depends on: none` — Can start immediately
@@ -111,7 +166,38 @@ For each stage, specify:
 - Minimize the dependency chain. Long chains amplify failures.
 - Document what output from the dependency is consumed.
 
-### Step 5: Final Proof Definition
+### Step 7: Construction-Time Validation
+
+Before presenting the plan, validate every stage's verification check:
+
+**Validation Criteria:**
+1. **Machine-verifiable**: Can the check be executed by a tool (bash, test runner, linter, file comparison)?
+2. **Can genuinely fail**: Is there a plausible scenario where this check produces a non-zero exit code?
+3. **Produces evidence**: Does the check output constitute proof of pass/fail?
+4. **Is specific**: Is the command specific enough to target only this stage's work?
+
+**Validation process:**
+```
+For each stage:
+  check = stage.verification_check
+  
+  PASS if: check is a runnable command AND can fail AND produces output
+  FAIL if: check is vague ("looks good") OR cannot fail ("print success") OR produces no output
+  
+  If FAIL → Redesign the check. A stage without a valid check cannot proceed.
+```
+
+**Approved check patterns:**
+- `npx tsc --noEmit` → Machine-verifiable, can fail (type errors), produces error lines
+- `pytest tests/test_auth.py --tb=short` → Machine-verifiable, can fail (assertions), produces failure output
+- `grep "export function" src/utils.ts` → Machine-verifiable, can fail (pattern missing), produces match lines
+
+**Rejected check patterns:**
+- "Verify the code looks correct" → Not machine-verifiable, no pass/fail criterion
+- "Run the tests" → Too vague — which tests? What command?
+- "Check that it works" → No specific pass/fail criterion
+
+### Step 8: Final Proof Definition
 
 Before presenting the plan, define the Final Proof check:
 
@@ -119,7 +205,7 @@ Before presenting the plan, define the Final Proof check:
 - This is usually a combination of: all individual checks pass + integration test + original requirement met.
 - The Final Proof must be runnable after all stages complete.
 
-### Step 6: Present the Map
+### Step 9: Present the Map
 
 Present the plan in the standard format (see `templates/stage_plan_template.md`).
 

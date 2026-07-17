@@ -28,30 +28,42 @@ This is the standard output format for the Cartographer Agent. Fill in all field
 
 ### Stage 1: [Stage Name]
 
+**STAGE STATUS**: [PENDING / IN PROGRESS / PASS / FAIL / UNVERIFIED / BOUNCED]
+
 - **Goal**: [What this stage accomplishes]
 - **Expected Output**: [Concrete output — file, test result, data structure]
+- **Planned Files**: [Exact file paths this stage is expected to create or modify]
 - **Verification Check**: [Exact command or method]
 - **Check Type**: [standard / vision / self-verification]
 - **Dependencies**: none
 - **Domain**: [code / research / data / deployment / visual]
+- **Bounce Target**: [stage-id to re-enter on failure, or "same" for current stage]
 
 ### Stage 2: [Stage Name]
 
+**STAGE STATUS**: [PENDING / IN PROGRESS / PASS / FAIL / UNVERIFIED / BOUNCED]
+
 - **Goal**: [What this stage accomplishes]
 - **Expected Output**: [Concrete output]
+- **Planned Files**: [Exact file paths this stage is expected to create or modify]
 - **Verification Check**: [Exact command or method]
 - **Check Type**: [standard / vision / self-verification]
 - **Dependencies**: Stage 1
 - **Domain**: [code / research / data / deployment / visual]
+- **Bounce Target**: [stage-id to re-enter on failure, or "same" for current stage]
 
 ### Stage 3: [Stage Name]
 
+**STAGE STATUS**: [PENDING / IN PROGRESS / PASS / FAIL / UNVERIFIED / BOUNCED]
+
 - **Goal**: [What this stage accomplishes]
 - **Expected Output**: [Concrete output]
+- **Planned Files**: [Exact file paths this stage is expected to create or modify]
 - **Verification Check**: [Exact command or method]
 - **Check Type**: [standard / vision / self-verification]
 - **Dependencies**: Stage 2
 - **Domain**: [code / research / data / deployment / visual]
+- **Bounce Target**: [stage-id to re-enter on failure, or "same" for current stage]
 
 [Add more stages as needed]
 
@@ -89,8 +101,11 @@ Stage 4 (none) -------------------------->+
 
 - [ ] Plan reviewed by user
 - [ ] All stages have concrete outputs
+- [ ] All stages have planned files declared
 - [ ] All stages have failable checks
+- [ ] All checks validated as machine-verifiable (construction-time validation pass)
 - [ ] Dependencies are clear and non-circular
+- [ ] All bounce targets reference valid stage IDs
 - [ ] Final Proof is defined
 
 **Status**: [Pending / Accepted / Rejected]
@@ -121,8 +136,10 @@ Resume from checkpoint: Read the checkpoint file, verify completed stages are st
 
 1. Fill in all fields in the template above.
 2. Every stage MUST have a Verification Check that is a concrete, machine-verifiable command.
-3. Dependencies must be explicit and non-circular.
-4. The Final Proof must be defined BEFORE any stage is executed.
-5. Present the plan to the user for acceptance before proceeding.
-6. If the user requests changes, revise the plan and re-present.
-7. Only proceed to execution after the user accepts the plan (or if no user is present, after self-validation).
+3. Every stage MUST list Planned Files — exact paths the stage is expected to create or modify.
+4. Every stage SHOULD define a Bounce Target for targeted re-entry on failure.
+5. Dependencies must be explicit and non-circular.
+6. The Final Proof must be defined BEFORE any stage is executed.
+7. Present the plan to the user for acceptance before proceeding.
+8. If the user requests changes, revise the plan and re-present.
+9. Only proceed to execution after the user accepts the plan (or if no user is present, after self-validation).

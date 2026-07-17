@@ -140,6 +140,103 @@ After all parallel stages complete, merge their results into a single summary:
 
 ---
 
+---
+
+## Wave-Based Execution (DAG Pattern)
+
+For plans with multiple dependency layers, use wave-based execution. A wave is a batch of stages that can run concurrently because all their dependencies are satisfied.
+
+### Wave Protocol
+
+```
+Wave 1: [Stages with Depends on: none]
+Wave 2: [Stages whose dependencies were in Wave 1]
+Wave 3: [Stages whose dependencies were in Wave 2]
+...
+```
+
+### Example: 7-Stage Plan in 3 Waves
+
+```
+Stage 1: Refactor shared types     (Depends on: none)
+Stage 2: Refactor auth module      (Depends on: none)
+Stage 3: Refactor API client       (Depends on: none)
+---
+Stage 4: Update user endpoints     (Depends on: Stage 1, Stage 2)
+Stage 5: Update admin endpoints    (Depends on: Stage 1, Stage 2)
+---
+Stage 6: Integration tests         (Depends on: Stage 3, Stage 4, Stage 5)
+Stage 7: E2E tests                 (Depends on: Stage 3, Stage 4, Stage 5)
+```
+
+Execution shape:
+
+```
+Wave 1: Stage 1 + Stage 2 + Stage 3 (3 parallel)
+Wave 2: Stage 4 + Stage 5 (2 parallel, after Wave 1 completes)
+Wave 3: Stage 6 + Stage 7 (2 parallel, after Wave 2 completes)
+```
+
+### Wave Execution Rules
+
+1. All stages in a wave must complete before the next wave starts.
+2. If any stage in a wave fails, the entire wave is blocked until the failure is resolved.
+3. Within a wave, resource conflict checks apply: stages modifying the same file must be serialized.
+4. Wave execution produces a natural barrier for checkpoints and audit entries.
+
+### Resource Conflict Matrix
+
+Before dispatching a wave, construct a conflict matrix:
+
+```
+         | Stage 1 | Stage 2 | Stage 3
+---------|---------|---------|---------
+Stage 1  |    —    |  CONFLICT (same file) |  OK
+Stage 2  | CONFLICT|    —     |  OK
+Stage 3  |   OK    |   OK    |  —
+```
+
+- **CONFLICT**: Both stages modify the same file → serialize them within the wave.
+- **OK**: No shared files → safe to run in parallel.
+
+Conflict detection uses the `Planned Files` field from the stage plan.
+
+### Fan-Out / Fan-In Pattern
+
+**Fan-Out**: One stage produces output consumed by N downstream stages.
+
+```
+Stage 1: Define shared types (output: src/types.ts)
+  → Stage 2: Update auth (depends on Stage 1)
+  → Stage 3: Update API (depends on Stage 1)
+  → Stage 4: Update UI (depends on Stage 1)
+```
+
+**Fan-In**: N stages produce output consumed by one downstream stage.
+
+```
+Stage 1: Refactor middleware    \
+Stage 2: Refactor routes         > Stage 4: Integration tests
+Stage 3: Refactor validators   /
+```
+
+### Wave Boundary Checkpoints
+
+After each wave completes, save a checkpoint:
+
+```markdown
+# Wave Checkpoint: [Task Name]
+**Wave**: [N of Total]
+**Completed Stages**:
+- Stage 1: PASS (evidence: ...)
+- Stage 2: PASS (evidence: ...)
+- Stage 3: PASS (evidence: ...)
+**Next Wave**: Stage 4, Stage 5 (dependencies satisfied)
+**Audit Trail**: chain.audit.jsonl entries aud-001 to aud-008 (hash chain intact)
+```
+
+---
+
 ## Anti-Patterns
 
 ### Simulating Parallelism
@@ -157,3 +254,7 @@ After all parallel stages complete, merge their results into a single summary:
 ### Not Waiting for All Results
 **Wrong**: Proceeding to dependent stages before all parallel stages complete.
 **Right**: Wait for all parallel stages to complete and collect all results before proceeding.
+
+### Failing to Record Wave Boundaries
+**Wrong**: Not checkpointing between waves, losing cross-wave context.
+**Right**: Save a checkpoint and audit entry after each wave completes.

@@ -22,6 +22,9 @@ This document lists all failure scenarios that may be encountered during fable m
 | F10 | Prior stage regression after fix | High | Re-run all affected stage checks |
 | F11 | Cartographer plan has gaps | Medium | Return to Cartographer, revise plan |
 | F12 | Agent produces non-verifiable output | Medium | Flag as UNVERIFIED, do not mark PASS |
+| F13 | Bounce target chain too long | Medium | Re-plan dependencies, shorten chain |
+| F14 | Scope drift detected | Medium | Revert unplanned changes or revise plan |
+| F15 | Audit trail integrity check fails | Critical | Stop — possible tampering detected |
 
 ---
 
@@ -251,3 +254,79 @@ This document lists all failure scenarios that may be encountered during fable m
 - "The code is clean" → UNVERifiable. Use lint instead.
 - "The design looks good" → UNVERifiable. Use screenshot comparison or accessibility audit.
 - "The research is thorough" → Partially verifiable. Use citation coverage check.
+
+---
+
+### F13: Bounce Target Chain Too Long
+
+**Severity**: Medium
+
+**Trigger**: A stage's bounce target chain exceeds 3 hops (e.g., Stage 5 bounces to Stage 3, which bounces to Stage 1, which bounces to plan).
+
+**Detection**:
+- During execution, track the bounce chain length.
+- If a single failure triggers 3+ bounces, this failure is triggered.
+
+**Handling Steps**:
+1. STOP. The bounce chain is not converging.
+2. Identify the root cause — why are bounces cascading?
+3. Propose a re-plan: either break the dependency chain or merge the bouncing stages into one.
+4. Update the stage plan with corrected bounce targets.
+
+**Prevention**:
+- During planning, keep bounce targets within 1 hop of the failing stage.
+- Avoid chains: `Stage N bounces to Stage N-2 bounces to Stage N-3`.
+- Prefer `same` (re-run current stage) or `plan` (full re-plan) over intermediate bounces.
+
+---
+
+### F14: Scope Drift Detected
+
+**Severity**: Medium
+
+**Trigger**: The Blacksmith's scope guard detects that a stage modified a file outside its `Planned Files` list.
+
+**Detection**:
+- After executing a stage, compare the set of modified files against the declared `Planned Files`.
+- Any file outside the planned list triggers this failure.
+
+**Handling Steps**:
+1. Identify the unplanned file(s).
+2. Assess whether the change was intentional:
+   - **Accidental**: Revert the unplanned change. Re-run the check.
+   - **Intentional but unplanned**: Flag for Cartographer revision. Add the file to the plan.
+3. If the unplanned file belongs to another stage's planned files → trigger F5 (parallel conflict).
+4. Record the drift in the audit trail.
+
+**Prevention**:
+- Cartographer should declare all files each stage will touch.
+- Use `src/dir/**` globs when a stage touches many files in a directory.
+- Review planned files before accepting the stage plan.
+
+---
+
+### F15: Audit Trail Integrity Check Fails
+
+**Severity**: Critical
+
+**Trigger**: The Sage's chain verification command detects a hash mismatch in `.fable/trail/chain.audit.jsonl`.
+
+**Detection**:
+- Run the chain verification command (see `references/audit_trail.md`).
+- If any entry's `this_hash` does not match the re-computed hash, this failure is triggered.
+- If any entry's `prev_hash` does not match the previous entry's `this_hash`, this failure is triggered.
+
+**Handling Steps**:
+1. STOP immediately. The audit trail may have been tampered with.
+2. Identify the first entry where the chain breaks.
+3. Determine if the tampering was:
+   - **External** (someone edited the file manually) → Restore from backup or re-run the affected stage.
+   - **Internal** (a bug in the recording code) → Fix the bug and re-record affected entries.
+   - **Malicious** (unauthorized modification) → Escalate to security.
+4. If the chain cannot be repaired, flag the entire run as `TRAIL_COMPROMISED`.
+5. The Mirror must review any delivery where the trail is compromised.
+
+**Prevention**:
+- Run chain verification as part of each stage completion.
+- Store the audit trail in a location with restricted write access.
+- Consider backing up `chain.audit.jsonl` after each stage.

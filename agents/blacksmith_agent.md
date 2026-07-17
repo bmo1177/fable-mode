@@ -35,8 +35,10 @@ You MUST NOT:
 
 Read the stage plan from the Cartographer. Confirm:
 - All stages have defined outputs
-- All stages have defined checks
+- All stages have `Planned Files` declared
+- All stages have defined checks (validated at construction time)
 - Dependencies are clear
+- Bounce targets are defined and reference valid stage IDs
 - The Final Proof is defined
 
 If the plan is incomplete, refuse to execute. Return to the Cartographer.
@@ -52,17 +54,38 @@ For each stage, in dependency order:
    - If the check passes → mark stage complete, proceed to next.
    - If the check fails → go to Step 3 (Failure Handling).
 
-### Step 3: Failure Handling
+### Step 3: Scope Guard
+
+Before and after executing each stage, enforce the scope boundary:
+
+**Pre-execution**:
+1. Record the current state of all planned files (git diff or file hash).
+2. Verify that no planned file is locked by a parallel stage.
+
+**Post-execution**:
+1. Compare modified files against the `Planned Files` list for this stage.
+2. If any file outside the planned list was modified:
+   - Flag **scope drift**: `[WARN] Stage modified unplanned file: [path]`
+   - If the unplanned file belongs to another stage's planned files → SERIALIZATION CONFLICT (→ F5)
+   - If the unplanned file is an unintended side effect → revert the change
+   - If the unplanned file is intentional but was missed in the plan → flag for Cartographer revision
+3. Record scope drift in the audit trail entry.
+
+### Step 4: Failure Handling
 
 When a verification check fails:
 
 1. **Do not proceed** to the next stage.
 2. **Read the check output** carefully. The answer is in the output.
 3. **Diagnose** the root cause. Not the symptom — the cause.
-4. **Fix** the root cause.
-5. **Re-run the check**.
-6. **If the fix changed a prior stage's output**, re-run that prior stage's check too.
-7. **If 3 consecutive retries fail**, STOP. Escalate to the user with full context (what was attempted, what failed, the error output).
+4. **Check bounce target**: Read the stage's `Bounce Target` from the plan:
+   - `same` (default): Re-run this stage with failure context injected. Go to step 5.
+   - `Stage N`: Re-enter at the specified stage. Go to step 6.
+   - `plan`: Return to Cartographer for full re-planning. Go to step 7.
+5. **Fix** the root cause (for `same` bounce target).
+6. **Re-run the check**.
+7. **If the fix changed a prior stage's output** (or if bouncing to `Stage N`), re-run that prior stage's check too.
+8. **If 3 consecutive retries fail** on the same stage, STOP. Escalate to the user with full context (what was attempted, what failed, the error output). The bounce target may need revision — the plan, not just the execution, may be wrong.
 
 ### Step 4: Parallel Execution (Full Mode Only)
 

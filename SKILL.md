@@ -8,8 +8,8 @@ description: >
   Trigger when the user explicitly asks ("fable mode" or "fable mode on") or requests Hero's Guild discipline.
   Do NOT trigger on single-step tasks, quick questions, brainstorming sessions, or when the user explicitly declines.
 metadata:
-  version: "2.1.0"
-  last_updated: "2026-06-24"
+  version: "3.0.0"
+  last_updated: "2026-07-17"
   status: active
   data_access_level: raw
   task_type: multi-step
@@ -37,6 +37,17 @@ A task execution framework that refuses to let agents work beneath their own sta
 - **Memory Integration** — Cross-session memory for verified facts and user preferences
 
 **v2.1** — Fable 5 deep integration:
+
+**v3.0** — Governance & verification expansion:
+- **Hash-Chained Audit Trail** — SHA-256 chain for tamper-evident evidence ledger
+- **Scope Guard** — `Planned Files` declaration per stage; drift detection on modification
+- **Construction-Time Validation** — Pre-execution check validation (can this check fail honestly?)
+- **Shadow Mode** — Non-blocking observation mode with `FABLE_SHADOW=1` for safe adoption
+- **Bounce Targets** — Targeted re-entry: `VERDICT: FAIL(target-id): reason` for precise failure recovery
+- **Model-Tier Branching** — Frontier vs local decomposition granularity (coarse vs fine-grained stages)
+- **Wave-Based DAG Execution** — Batch + barrier pattern for structured parallel execution
+- **Adversarial Review** — Dual independent reviewer with no shared implementation context
+- **Status Badges** — Per-stage visual status tracking throughout execution
 - **Effort Control** — Different thinking depth for different stages (high/xhigh for planning, medium for execution)
 - **Fresh-Context Verification** — Separate verifier subagent for final review
 - **Progress Grounding** — Every progress claim must cite tool evidence
@@ -61,6 +72,16 @@ fable mode full — migrate our API from v1 to v2, touching 12 endpoints
 **Lite mode for moderate tasks:**
 ```
 fable mode lite — add input validation to the registration form
+```
+
+**Shadow mode (safe adoption):**
+```
+FABLE_SHADOW=1 fable mode on — refactor auth module across 5 files
+```
+
+**With explicit model tier:**
+```
+fable mode local — add form validation across 3 files
 ```
 
 **Execution:**
@@ -120,6 +141,21 @@ User Input
 | `basic` | Multi-file, sequential steps, no parallel runtime | Full 4-rite pipeline, sequential execution |
 | `full` | Large tasks, parallel runtime available | Full 4-rite pipeline + parallel delegation of independent stages |
 | `lite` | Moderate tasks, 2-4 steps | Simplified map + proof + mirror (skip formal agent dispatch) |
+
+### Model-Tier Adaptation
+
+The model driving the agent affects how stages should be decomposed. Declare the model tier during planning:
+
+| Model Tier | Examples | Decomposition Guidance |
+|------------|----------|----------------------|
+| **frontier** (default) | Opus, Sonnet 4.x, GPT-4.5+ | Coarser stages, broader scope per stage, implicit dependencies OK |
+| **local** | Haiku, GPT-4o-mini, Llama, Phi | Finer stages, single-responsibility per stage, explicit acceptance criteria required, clear output contracts between stages |
+
+When the agent detects a `local`-tier model, the Cartographer must:
+1. Break each logical action into its own stage.
+2. Add explicit acceptance criteria (not just a verification command).
+3. Document the output contract for each dependency.
+4. Limit stages to one file change per stage where possible.
 
 ---
 
@@ -509,9 +545,11 @@ send_to_user(
 | `agents/deployer_agent.md` | Deployment specialist — environment checks, rollback, smoke tests |
 | `references/check_types_by_domain.md` | Verification check patterns by domain |
 | `references/gate_protocol.md` | Gate conditions in detail |
-| `references/failure_paths.md` | Complete failure path map |
-| `references/parallel_delegation_guide.md` | Parallel delegation patterns |
+| `references/failure_paths.md` | Complete failure path map (15 scenarios, including F13-F15) |
+| `references/parallel_delegation_guide.md` | Parallel delegation patterns + wave-based execution |
 | `references/verification_examples.md` | 20+ concrete check examples (including vision & self-verification) |
+| `references/audit_trail.md` | Hash-chained evidence ledger with SHA-256 verification |
+| `references/shadow_mode.md` | Non-blocking observation mode for safe adoption |
 | `references/fallback_guide.md` | Handling refusals and fallback mechanisms |
 | `references/memory_system.md` | Cross-session learning and memory structure |
 | `references/changelog.md` | Version history |
